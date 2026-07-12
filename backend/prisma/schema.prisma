@@ -114,3 +114,30 @@ enum MaintenanceStatus {
   OPEN
   CLOSED
 }
+
+model FuelLog {
+  id        String   @id @default(uuid())
+  vehicleId String
+  tripId    String?
+  liters    Float
+  cost      Float
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+}
+
+model Expense {
+  id          String   @id @default(uuid())
+  vehicleId   String
+  type        ExpenseType
+  amount      Float
+  description String?
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+}
+
+enum ExpenseType {
+  TOLL
+  FINE
+  PARKING
+  OTHER
+}
