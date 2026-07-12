@@ -216,6 +216,10 @@
     outline: none;
     border-color: var(--accent);
   }
+  select.select-warning {
+    border-color: var(--warn) !important;
+    color: var(--warn);
+  }
 
   button.run {
     background: var(--accent);
@@ -364,6 +368,8 @@
     <label style="font-size:12px;color:var(--text-dim);">Base URL</label>
     <input id="baseUrlInput" value="http://localhost:4000" />
     <div id="sessionInfo">
+      <span id="listStatus" style="font-size:11px;color:var(--text-dim);"></span>
+      <button id="refreshBtn" onclick="loadDropdownData()" style="background:transparent;border:1px solid var(--border);color:var(--text-dim);padding:5px 10px;border-radius:6px;cursor:pointer;font-size:12px;">Refresh Lists</button>
       <span id="sessionBadge">Not logged in</span>
       <button id="logoutBtn" onclick="logout()">Logout</button>
     </div>
@@ -450,7 +456,7 @@
       <div class="endpoint-tag">PATCH /vehicles/:id <span class="access-tag">Fleet Manager</span></div>
       <form class="card" onsubmit="return runVehicleUpdate(event)">
         <div class="field-row">
-          <div class="field"><label>Vehicle ID</label><input id="vuId" placeholder="vehicle uuid" /></div>
+          <div class="field"><label>Vehicle</label><select id="vuId" class="vehicle-select" data-mode="required"></select></div>
           <div class="field"><label>Status</label>
             <select id="vuStatus"><option value="">(unchanged)</option><option>AVAILABLE</option><option>ON_TRIP</option><option>IN_SHOP</option><option>RETIRED</option></select>
           </div>
@@ -469,7 +475,7 @@
       <h2>Delete Vehicle</h2>
       <div class="endpoint-tag">DELETE /vehicles/:id <span class="access-tag">Fleet Manager</span></div>
       <form class="card" onsubmit="return runVehicleDelete(event)">
-        <div class="field"><label>Vehicle ID</label><input id="vdId" placeholder="vehicle uuid" /></div>
+        <div class="field"><label>Vehicle</label><select id="vdId" class="vehicle-select" data-mode="required"></select></div>
         <button class="run danger" type="submit" style="margin-top:10px;">Delete Vehicle</button>
       </form>
       <div id="resp-vehicleDelete"></div>
@@ -479,7 +485,7 @@
       <h2>Vehicle Operational Cost</h2>
       <div class="endpoint-tag">GET /vehicles/:id/operational-cost <span class="access-tag">All roles</span></div>
       <form class="card" onsubmit="return runVehicleCost(event)">
-        <div class="field"><label>Vehicle ID</label><input id="vocId" placeholder="vehicle uuid" /></div>
+        <div class="field"><label>Vehicle</label><select id="vocId" class="vehicle-select" data-mode="required"></select></div>
         <button class="run" type="submit" style="margin-top:10px;">Get Cost</button>
       </form>
       <div id="resp-vehicleCost"></div>
@@ -521,7 +527,7 @@
       <div class="endpoint-tag">PATCH /drivers/:id <span class="access-tag">Fleet Manager (full) / Safety Officer (status + safetyScore only)</span></div>
       <form class="card" onsubmit="return runDriverUpdate(event)">
         <div class="field-row">
-          <div class="field"><label>Driver ID</label><input id="duId" placeholder="driver uuid" /></div>
+          <div class="field"><label>Driver</label><select id="duId" class="driver-select" data-mode="required"></select></div>
           <div class="field"><label>Status</label>
             <select id="duStatus"><option value="">(unchanged)</option><option>AVAILABLE</option><option>ON_TRIP</option><option>OFF_DUTY</option><option>SUSPENDED</option></select>
           </div>
@@ -540,7 +546,7 @@
       <h2>Delete Driver</h2>
       <div class="endpoint-tag">DELETE /drivers/:id <span class="access-tag">Fleet Manager</span></div>
       <form class="card" onsubmit="return runDriverDelete(event)">
-        <div class="field"><label>Driver ID</label><input id="ddId" placeholder="driver uuid" /></div>
+        <div class="field"><label>Driver</label><select id="ddId" class="driver-select" data-mode="required"></select></div>
         <button class="run danger" type="submit" style="margin-top:10px;">Delete Driver</button>
       </form>
       <div id="resp-driverDelete"></div>
@@ -568,8 +574,8 @@
           <div class="field"><label>Destination</label><input id="tcDest" value="Warehouse B" /></div>
         </div>
         <div class="field-row">
-          <div class="field"><label>Vehicle ID</label><input id="tcVehicle" placeholder="vehicle uuid" /></div>
-          <div class="field"><label>Driver ID</label><input id="tcDriver" placeholder="driver uuid" /></div>
+          <div class="field"><label>Vehicle</label><select id="tcVehicle" class="vehicle-select" data-mode="required"></select></div>
+          <div class="field"><label>Driver</label><select id="tcDriver" class="driver-select" data-mode="required"></select></div>
         </div>
         <div class="field-row">
           <div class="field"><label>Cargo Weight</label><input id="tcCargo" value="450" /></div>
@@ -608,8 +614,8 @@
       <form class="card" onsubmit="return runTripReassign(event)">
         <div class="field"><label>Trip ID</label><input id="trId" placeholder="trip uuid" /></div>
         <div class="field-row" style="margin-top:10px;">
-          <div class="field"><label>New Vehicle ID (optional)</label><input id="trVehicle" placeholder="leave blank to keep current" /></div>
-          <div class="field"><label>New Driver ID (optional)</label><input id="trDriver" placeholder="leave blank to keep current" /></div>
+          <div class="field"><label>New Vehicle (optional)</label><select id="trVehicle" class="vehicle-select" data-mode="optional"></select></div>
+          <div class="field"><label>New Driver (optional)</label><select id="trDriver" class="driver-select" data-mode="optional"></select></div>
         </div>
         <button class="run" type="submit">Reassign</button>
       </form>
@@ -650,7 +656,7 @@
           <div class="field"><label>Status filter</label>
             <select id="mlStatus"><option value="">Any</option><option>OPEN</option><option>CLOSED</option></select>
           </div>
-          <div class="field"><label>Vehicle ID filter</label><input id="mlVehicle" placeholder="optional" /></div>
+          <div class="field"><label>Vehicle filter</label><select id="mlVehicle" class="vehicle-select" data-mode="filter"></select></div>
         </div>
         <button class="run" type="submit">List Records</button>
       </form>
@@ -663,7 +669,7 @@
       <div class="endpoint-tag">POST /maintenance <span class="access-tag">Fleet Manager & Safety Officer</span></div>
       <form class="card" onsubmit="return runMaintCreate(event)">
         <div class="field-row">
-          <div class="field"><label>Vehicle ID</label><input id="mcVehicle" placeholder="vehicle uuid" /></div>
+          <div class="field"><label>Vehicle</label><select id="mcVehicle" class="vehicle-select" data-mode="required"></select></div>
           <div class="field"><label>Reason</label><input id="mcReason" value="Engine Overheat" /></div>
           <div class="field"><label>Cost</label><input id="mcCost" value="350" /></div>
         </div>
@@ -688,7 +694,7 @@
       <h2>List Fuel Logs</h2>
       <div class="endpoint-tag">GET /fuel-logs <span class="access-tag">All roles</span></div>
       <form class="card" onsubmit="return runFuelList(event)">
-        <div class="field"><label>Vehicle ID filter</label><input id="flVehicle" placeholder="optional" /></div>
+        <div class="field"><label>Vehicle filter</label><select id="flVehicle" class="vehicle-select" data-mode="filter"></select></div>
         <button class="run" type="submit" style="margin-top:10px;">List Fuel Logs</button>
       </form>
       <div id="resp-fuelList"></div>
@@ -699,7 +705,7 @@
       <div class="endpoint-tag">POST /fuel-logs <span class="access-tag">Fleet Manager & Driver</span></div>
       <form class="card" onsubmit="return runFuelCreate(event)">
         <div class="field-row">
-          <div class="field"><label>Vehicle ID</label><input id="fcVehicle" placeholder="vehicle uuid" /></div>
+          <div class="field"><label>Vehicle</label><select id="fcVehicle" class="vehicle-select" data-mode="required"></select></div>
           <div class="field"><label>Trip ID (optional)</label><input id="fcTrip" placeholder="optional" /></div>
         </div>
         <div class="field-row">
@@ -716,7 +722,7 @@
       <div class="endpoint-tag">GET /expenses <span class="access-tag">All roles</span></div>
       <form class="card" onsubmit="return runExpenseList(event)">
         <div class="field-row">
-          <div class="field"><label>Vehicle ID filter</label><input id="elVehicle" placeholder="optional" /></div>
+          <div class="field"><label>Vehicle filter</label><select id="elVehicle" class="vehicle-select" data-mode="filter"></select></div>
           <div class="field"><label>Type filter</label>
             <select id="elType"><option value="">Any</option><option>TOLL</option><option>FINE</option><option>PARKING</option><option>OTHER</option></select>
           </div>
@@ -731,7 +737,7 @@
       <div class="endpoint-tag">POST /expenses <span class="access-tag">Fleet Manager only</span></div>
       <form class="card" onsubmit="return runExpenseCreate(event)">
         <div class="field-row">
-          <div class="field"><label>Vehicle ID</label><input id="ecVehicle" placeholder="vehicle uuid" /></div>
+          <div class="field"><label>Vehicle</label><select id="ecVehicle" class="vehicle-select" data-mode="required"></select></div>
           <div class="field"><label>Type</label>
             <select id="ecType"><option>TOLL</option><option>FINE</option><option>PARKING</option><option>OTHER</option></select>
           </div>
@@ -786,7 +792,7 @@
       <div class="endpoint-tag">GET /reports/vehicle/:id <span class="access-tag">All roles</span></div>
       <form class="card" onsubmit="return runVehicleReport(event)">
         <div class="field-row">
-          <div class="field"><label>Vehicle ID</label><input id="vrId" placeholder="vehicle uuid" /></div>
+          <div class="field"><label>Vehicle</label><select id="vrId" class="vehicle-select" data-mode="required"></select></div>
           <div class="field"><label>Revenue (optional, for ROI)</label><input id="vrRevenue" placeholder="e.g. 500" /></div>
         </div>
         <button class="run" type="submit">Get Report</button>
@@ -819,7 +825,7 @@
       <h2>Export Single Vehicle Summary — PDF</h2>
       <div class="endpoint-tag">GET /reports/export/vehicle/:id/summary.pdf <span class="access-tag">Fleet Manager & Financial Analyst</span></div>
       <form class="card" onsubmit="return runVehiclePdfExport(event)">
-        <div class="field"><label>Vehicle ID</label><input id="evpId" placeholder="vehicle uuid" /></div>
+        <div class="field"><label>Vehicle</label><select id="evpId" class="vehicle-select" data-mode="required"></select></div>
         <button class="run" type="submit" style="margin-top:10px;">Download Summary PDF</button>
       </form>
       <div id="resp-exportVehiclePdf"></div>
@@ -832,6 +838,8 @@
   // ---------- State ----------
   let token = null;
   let currentUser = null;
+  let vehiclesCache = [];
+  let driversCache = [];
 
   // ---------- Navigation ----------
   document.querySelectorAll('.nav-item').forEach(item => {
@@ -866,7 +874,101 @@
   function logout() {
     token = null;
     currentUser = null;
+    vehiclesCache = [];
+    driversCache = [];
     updateSessionBadge();
+    populateAllSelects();
+    document.getElementById('listStatus').textContent = '';
+  }
+
+  // ---------- Dropdown data loading (fixes "have to paste long vehicle/driver UUID" problem) ----------
+  async function loadDropdownData() {
+    if (!token) {
+      document.getElementById('listStatus').textContent = 'Log in first to load lists';
+      return;
+    }
+    document.getElementById('listStatus').textContent = 'Loading vehicles & drivers...';
+    const [vResult, dResult] = await Promise.all([
+      apiRequest('GET', '/vehicles'),
+      apiRequest('GET', '/drivers'),
+    ]);
+
+    vehiclesCache = (vResult.ok && Array.isArray(vResult.data)) ? vResult.data : [];
+    driversCache = (dResult.ok && Array.isArray(dResult.data)) ? dResult.data : [];
+
+    populateAllSelects();
+
+    const parts = [];
+    parts.push(vehiclesCache.length ? `${vehiclesCache.length} vehicles` : 'no vehicles');
+    parts.push(driversCache.length ? `${driversCache.length} drivers` : 'no drivers');
+    document.getElementById('listStatus').textContent = parts.join(' · ');
+  }
+
+  function vehicleOptionLabel(v) {
+    return `${v.regNumber} — ${v.name} (${v.status})`;
+  }
+  function driverOptionLabel(d) {
+    return `${d.name} — ${d.licenseNumber} (${d.status})`;
+  }
+
+  function fillSelect(select, items, labelFn, mode, emptyEntityName) {
+    const previousValue = select.value;
+    select.innerHTML = '';
+
+    if (!items.length) {
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = `⚠ No ${emptyEntityName} available — register one first`;
+      opt.disabled = true;
+      opt.selected = true;
+      select.appendChild(opt);
+      select.classList.add('select-warning');
+      select.disabled = true;
+      return;
+    }
+
+    select.disabled = false;
+    select.classList.remove('select-warning');
+
+    if (mode === 'filter') {
+      const anyOpt = document.createElement('option');
+      anyOpt.value = '';
+      anyOpt.textContent = '-- Any --';
+      select.appendChild(anyOpt);
+    } else if (mode === 'optional') {
+      const keepOpt = document.createElement('option');
+      keepOpt.value = '';
+      keepOpt.textContent = '-- keep current --';
+      select.appendChild(keepOpt);
+    } else {
+      const placeholderOpt = document.createElement('option');
+      placeholderOpt.value = '';
+      placeholderOpt.textContent = '-- Select --';
+      placeholderOpt.disabled = true;
+      placeholderOpt.selected = true;
+      select.appendChild(placeholderOpt);
+    }
+
+    items.forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = item.id;
+      opt.textContent = labelFn(item);
+      select.appendChild(opt);
+    });
+
+    // Restore previous selection if it still exists in the refreshed list
+    if (previousValue && items.some(i => i.id === previousValue)) {
+      select.value = previousValue;
+    }
+  }
+
+  function populateAllSelects() {
+    document.querySelectorAll('select.vehicle-select').forEach(sel => {
+      fillSelect(sel, vehiclesCache, vehicleOptionLabel, sel.dataset.mode, 'vehicles');
+    });
+    document.querySelectorAll('select.driver-select').forEach(sel => {
+      fillSelect(sel, driversCache, driverOptionLabel, sel.dataset.mode, 'drivers');
+    });
   }
 
   // ---------- Generic request runner ----------
@@ -937,6 +1039,7 @@
       token = result.data.token;
       currentUser = result.data.user;
       updateSessionBadge();
+      loadDropdownData();
     }
     return false;
   }
@@ -963,6 +1066,7 @@
     };
     const result = await apiRequest('POST', '/vehicles', body);
     renderResponse('vehicleCreate', result);
+    if (result.ok) loadDropdownData();
     return false;
   }
 
@@ -988,6 +1092,7 @@
     const id = document.getElementById('vdId').value;
     const result = await apiRequest('DELETE', `/vehicles/${id}`);
     renderResponse('vehicleDelete', result);
+    if (result.ok) loadDropdownData();
     return false;
   }
 
@@ -1019,6 +1124,7 @@
     };
     const result = await apiRequest('POST', '/drivers', body);
     renderResponse('driverCreate', result);
+    if (result.ok) loadDropdownData();
     return false;
   }
 
@@ -1042,6 +1148,7 @@
     const id = document.getElementById('ddId').value;
     const result = await apiRequest('DELETE', `/drivers/${id}`);
     renderResponse('driverDelete', result);
+    if (result.ok) loadDropdownData();
     return false;
   }
 
@@ -1080,6 +1187,7 @@
     };
     const result = await apiRequest('PATCH', `/trips/${id}/dispatch`, body);
     renderResponse('tripDispatch', result);
+    if (result.ok) loadDropdownData();
     return false;
   }
 
@@ -1093,6 +1201,7 @@
     if (d) body.driverId = d;
     const result = await apiRequest('PATCH', `/trips/${id}/reassign`, body);
     renderResponse('tripReassign', result);
+    if (result.ok) loadDropdownData();
     return false;
   }
 
@@ -1106,6 +1215,7 @@
     };
     const result = await apiRequest('PATCH', `/trips/${id}/complete`, body);
     renderResponse('tripComplete', result);
+    if (result.ok) loadDropdownData();
     return false;
   }
 
@@ -1114,6 +1224,7 @@
     const id = document.getElementById('txId').value;
     const result = await apiRequest('PATCH', `/trips/${id}/cancel`, null);
     renderResponse('tripCancel', result);
+    if (result.ok) loadDropdownData();
     return false;
   }
 
@@ -1136,6 +1247,7 @@
     };
     const result = await apiRequest('POST', '/maintenance', body);
     renderResponse('maintCreate', result);
+    if (result.ok) loadDropdownData();
     return false;
   }
 
@@ -1144,6 +1256,7 @@
     const id = document.getElementById('mxId').value;
     const result = await apiRequest('PATCH', `/maintenance/${id}/close`, null);
     renderResponse('maintClose', result);
+    if (result.ok) loadDropdownData();
     return false;
   }
 
