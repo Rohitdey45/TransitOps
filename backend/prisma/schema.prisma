@@ -99,3 +99,18 @@ enum VehicleCondition {
   FAIR
   POOR
 }
+
+model MaintenanceLog {
+  id          String   @id @default(uuid())
+  vehicleId   String
+  reason      String
+  cost        Float    @default(0)
+  status      MaintenanceStatus @default(OPEN)
+  createdAt   DateTime @default(now())
+  closedAt    DateTime?
+}
+
+enum MaintenanceStatus {
+  OPEN
+  CLOSED
+}
