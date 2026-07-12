@@ -11,7 +11,7 @@ async function main() {
     { email: 'tom@transitops.com', password: 'password123', name: 'Finance Analyst', role: 'FINANCIAL_ANALYST' },
   ];
 
-  fo r(const u of users) {
+  for (const u of users) {
     const hashed = await hashPassword(u.password);
     await prisma.user.upsert({
       where: { email: u.email },
