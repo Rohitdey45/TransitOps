@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TransitOps Command Center</title>
+
+    <link rel="stylesheet" href="/frontend/css/style.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- Sidebar -->
+
+        <aside class="sidebar">
+
+            <div class="logo">
+
+                <i class="fa-solid fa-truck-fast"></i>
+
+                <h2>TransitOps</h2>
+
+            </div>
+
+            <ul class="menu">
+
+                <li class="active">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Dashboard</span>
+                </li>
+
+                <li>
+                    <i class="fa-solid fa-truck"></i>
+                    <span>Vehicles</span>
+                </li>
+
+                <li>
+                    <i class="fa-solid fa-id-card"></i>
+                    <span>Drivers</span>
+                </li>
+
+                <li>
+                    <i class="fa-solid fa-route"></i>
+                    <span>Trips</span>
+                </li>
+
+                <li>
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                    <span>Maintenance</span>
+                </li>
+
+                <li>
+                    <i class="fa-solid fa-gas-pump"></i>
+                    <span>Fuel Logs</span>
+                </li>
+
+                <li>
+                    <i class="fa-solid fa-wallet"></i>
+                    <span>Expenses</span>
+                </li>
+
+                <li>
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Analytics</span>
+                </li>
+
+                <li>
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Settings</span>
+                </li>
+
+            </ul>
+
+        </aside>
+
+        <!-- Main -->
+
+        <main class="main">
+
+            <!-- Navbar -->
+
+            <header class="navbar">
+
+                <div class="search">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input type="text" placeholder="Search">
+
+                </div>
+
+                <div class="nav-right">
+
+                    <button class="icon-btn">
+
+                        <i class="fa-solid fa-bell"></i>
+
+                    </button>
+
+                    <div class="profile">
+
+                        <img src="https://i.pravatar.cc/45" alt="">
+
+                        <div>
+
+                            <h4>Fleet Manager</h4>
+
+                            <span>Administrator</span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+            <!-- Page Title -->
+
+            <section class="page-title">
+
+                <div>
+
+                    <h1>Command Center</h1>
+
+                    <p>Monitor your fleet in real time</p>
+
+                </div>
+
+                <button class="primary-btn">
+
+                    <i class="fa-solid fa-plus"></i>
+
+                    Create Trip
+
+                </button>
+
+            </section>
+
+            <!-- KPI Cards -->
+
+            <section class="cards">
+
+                <div class="card">
+
+                    <h3>Active Vehicles</h3>
+
+                    <h1>148</h1>
+
+                    <span class="green">+12%</span>
+
+                </div>
+
+                <div class="card">
+
+                    <h3>Drivers On Duty</h3>
+
+                    <h1>82</h1>
+
+                    <span class="green">+8%</span>
+
+                </div>
+
+                <div class="card">
+
+                    <h3>Active Trips</h3>
+
+                    <h1>57</h1>
+
+                    <span class="orange">3 Pending</span>
+
+                </div>
+
+                <div class="card">
+
+                    <h3>Fleet Utilization</h3>
+
+                    <h1>87%</h1>
+
+                    <span class="green">Excellent</span>
+
+                </div>
+
+            </section>
+
+            <!-- Charts -->
+
+            <section class="chart-grid">
+
+                <div class="chart-card">
+
+                    <h3>Fleet Utilization</h3>
+
+                    <canvas id="fleetChart"></canvas>
+
+                </div>
+
+                <div class="chart-card">
+
+                    <h3>Vehicle Status</h3>
+
+                    <canvas id="statusChart"></canvas>
+
+                </div>
+
+            </section>
+
+            <!-- Bottom -->
+
+            <section class="bottom-grid">
+
+                <!-- Trips -->
+
+                <div class="table-card">
+
+                    <div class="table-header">
+
+                        <h3>Recent Trips</h3>
+
+                        <button>View All</button>
+
+                    </div>
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>ID</th>
+
+                                <th>Vehicle</th>
+
+                                <th>Driver</th>
+
+                                <th>Status</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            <tr>
+
+                                <td>#1025</td>
+
+                                <td>Van-05</td>
+
+                                <td>Alex</td>
+
+                                <td><span class="badge active">On Trip</span></td>
+
+                            </tr>
+
+                            <tr>
+
+                                <td>#1024</td>
+
+                                <td>Truck-12</td>
+
+                                <td>James</td>
+
+                                <td><span class="badge complete">Completed</span></td>
+
+                            </tr>
+
+                            <tr>
+
+                                <td>#1023</td>
+
+                                <td>Mini-08</td>
+
+                                <td>John</td>
+
+                                <td><span class="badge pending">Pending</span></td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <!-- Alerts -->
+
+                <div class="alert-card">
+
+                    <h3>Maintenance Alerts</h3>
+
+                    <div class="alert">
+
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+
+                        <div>
+
+                            <h4>Truck-08</h4>
+
+                            <p>Oil Change Due Tomorrow</p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="alert">
+
+                        <i class="fa-solid fa-circle-exclamation"></i>
+
+                        <div>
+
+                            <h4>Van-05</h4>
+
+                            <p>Insurance expires in 5 days</p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="alert">
+
+                        <i class="fa-solid fa-user-clock"></i>
+
+                        <div>
+
+                            <h4>Driver License</h4>
+
+                            <p>Alex license expires in 7 days</p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+    <script src="/frontend/src/pages/login.jsx"></script>
+
+</body>
+
+</html>
