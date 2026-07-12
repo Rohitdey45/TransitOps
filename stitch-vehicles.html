@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TransitOps Vehicle Registry</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "background": "#141313",
+                    "on-tertiary-container": "#636565",
+                    "surface-container-lowest": "#0e0e0e",
+                    "on-background": "#e5e2e1",
+                    "secondary-fixed-dim": "#c8c6c6",
+                    "on-primary": "#2f3131",
+                    "on-secondary-fixed-variant": "#474747",
+                    "on-surface": "#e5e2e1",
+                    "on-tertiary": "#2f3131",
+                    "surface-container-low": "#1c1b1b",
+                    "inverse-surface": "#e5e2e1",
+                    "on-primary-container": "#636565",
+                    "on-surface-variant": "#c4c7c8",
+                    "on-error": "#690005",
+                    "secondary-container": "#474747",
+                    "secondary-fixed": "#e4e2e1",
+                    "inverse-on-surface": "#313030",
+                    "on-primary-fixed": "#1a1c1c",
+                    "error": "#ffb4ab",
+                    "error-container": "#93000a",
+                    "surface-dim": "#141313",
+                    "surface-container-highest": "#353434",
+                    "secondary": "#c8c6c6",
+                    "surface-variant": "#353434",
+                    "surface-container-high": "#2a2a2a",
+                    "surface-tint": "#c6c6c7",
+                    "primary-container": "#e2e2e2",
+                    "tertiary-container": "#e2e2e2",
+                    "primary-fixed-dim": "#c6c6c7",
+                    "primary": "#ffffff",
+                    "on-primary-fixed-variant": "#454747",
+                    "on-secondary-fixed": "#1b1c1c",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "on-secondary": "#303030",
+                    "surface-container": "#201f1f",
+                    "surface": "#141313",
+                    "on-tertiary-fixed-variant": "#454747",
+                    "tertiary-fixed": "#e2e2e2",
+                    "outline": "#8e9192",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "outline-variant": "#444748",
+                    "surface-bright": "#3a3939",
+                    "on-error-container": "#ffdad6",
+                    "on-secondary-container": "#b6b5b4",
+                    "tertiary": "#ffffff",
+                    "inverse-primary": "#5d5f5f",
+                    "primary-fixed": "#e2e2e2"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0px",
+                    "lg": "0px",
+                    "xl": "0px",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-page": "24px",
+                    "unit": "4px",
+                    "grid-size": "32px",
+                    "container-padding": "12px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "mono-data": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                    "mono-data": ["14px", {"lineHeight": "1", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "headline-sm": ["18px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #141313;
+            color: #e5e2e1;
+            overflow: hidden;
+        }
+        .operational-frame {
+            border: 1px solid #FFFFFF;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .grid-texture {
+            background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #141313;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333333;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #FFFFFF;
+        }
+        .side-panel {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(100%);
+        }
+        .side-panel.open {
+            transform: translateX(0);
+        }
+        .custom-status-pill {
+            padding: 2px 8px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md grid-texture">
+<div class="operational-frame">
+<!-- Side Navigation Shell -->
+<nav class="flex flex-col fixed left-0 top-0 h-full z-40 bg-background w-64 border-r border-outline-variant">
+<div class="p-6">
+<div class="font-headline-md text-headline-md font-bold tracking-tighter text-primary">TRANSITOPS</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant opacity-60">COMMAND CENTER</div>
+</div>
+<div class="flex-1 flex flex-col mt-4">
+<!-- Nav Items Map -->
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:text-primary border border-transparent hover:border-primary transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 bg-primary text-on-primary border border-primary scale-[0.99] transition-transform" href="#">
+<span class="material-symbols-outlined">directions_bus</span>
+<span class="font-label-caps text-label-caps">Vehicles</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:text-primary border border-transparent hover:border-primary transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">person_pin</span>
+<span class="font-label-caps text-label-caps">Drivers</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:text-primary border border-transparent hover:border-primary transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">route</span>
+<span class="font-label-caps text-label-caps">Trips</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:text-primary border border-transparent hover:border-primary transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">build</span>
+<span class="font-label-caps text-label-caps">Maintenance</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:text-primary border border-transparent hover:border-primary transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-caps text-label-caps">Expenses</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:text-primary border border-transparent hover:border-primary transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-caps text-label-caps">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:text-primary border border-transparent hover:border-primary transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-caps text-label-caps">Documents</span>
+</a>
+</div>
+<div class="p-6 border-t border-outline-variant mt-auto">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-surface-container-highest border border-outline flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">account_circle</span>
+</div>
+<div>
+<div class="font-label-caps text-label-caps text-primary">OP_ALPHA</div>
+<div class="text-[10px] text-on-surface-variant">SECURE_NODE_01</div>
+</div>
+</div>
+</div>
+</nav>
+<!-- Top Navigation Shell -->
+<header class="fixed top-0 right-0 left-64 flex justify-between items-center px-gutter h-16 z-30 bg-background border-b border-outline-variant">
+<div class="flex items-center gap-6">
+<span class="font-headline-sm text-headline-sm font-bold text-primary">VEHICLE REGISTRY</span>
+<nav class="flex gap-4">
+<a class="text-on-surface-variant hover:text-primary font-label-caps text-label-caps px-2 transition-colors" href="#">Driver</a>
+<a class="text-on-surface-variant hover:text-primary font-label-caps text-label-caps px-2 transition-colors" href="#">Dispatcher</a>
+<a class="text-primary font-bold border-b border-primary font-label-caps text-label-caps px-2 transition-colors" href="#">Admin</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer active:opacity-80 transition-colors">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer active:opacity-80 transition-colors">logout</button>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="ml-64 mt-16 flex-1 overflow-auto p-gutter relative">
+<!-- Filters & Action Bar -->
+<section class="mb-gutter flex flex-wrap items-end justify-between gap-4">
+<div class="flex flex-wrap items-end gap-6">
+<!-- Search Field -->
+<div class="w-64">
+<label class="font-label-caps text-label-caps text-on-surface-variant mb-1 block">SEARCH_IDENTIFIER</label>
+<div class="relative group">
+<input class="w-full bg-background border border-outline-variant focus:border-primary text-on-surface p-2 pl-10 focus:ring-0 transition-colors placeholder:text-outline-variant" placeholder="VIN / LICENSE / ID" type="text"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary text-[18px]">search</span>
+</div>
+</div>
+<!-- Filter Groups -->
+<div class="flex flex-col">
+<label class="font-label-caps text-label-caps text-on-surface-variant mb-1 block">STATUS_FILTER</label>
+<div class="flex gap-px bg-outline-variant border border-outline-variant">
+<button class="px-4 py-2 bg-primary text-on-primary font-label-caps text-[10px]">ALL</button>
+<button class="px-4 py-2 bg-background text-on-surface-variant hover:text-primary transition-colors font-label-caps text-[10px]">AVAILABLE</button>
+<button class="px-4 py-2 bg-background text-on-surface-variant hover:text-primary transition-colors font-label-caps text-[10px]">ON TRIP</button>
+<button class="px-4 py-2 bg-background text-on-surface-variant hover:text-primary transition-colors font-label-caps text-[10px]">IN SHOP</button>
+<button class="px-4 py-2 bg-background text-on-surface-variant hover:text-primary transition-colors font-label-caps text-[10px]">RETIRED</button>
+</div>
+</div>
+</div>
+<!-- Add Button -->
+<button class="border border-outline hover:border-primary px-6 py-2 flex items-center gap-2 text-primary font-label-caps text-label-caps transition-all duration-150 active:scale-95" onclick="toggleSidePanel()">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                    ADD VEHICLE
+                </button>
+</section>
+<!-- Data Table -->
+<div class="border border-outline-variant bg-[#151515]">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-high border-b border-outline-variant">
+<th class="px-4 py-3 font-label-caps text-label-caps text-on-surface-variant">VEHICLE_ID</th>
+<th class="px-4 py-3 font-label-caps text-label-caps text-on-surface-variant">MODEL_SPEC</th>
+<th class="px-4 py-3 font-label-caps text-label-caps text-on-surface-variant">PLATE_NO</th>
+<th class="px-4 py-3 font-label-caps text-label-caps text-on-surface-variant">OPS_STATUS</th>
+<th class="px-4 py-3 font-label-caps text-label-caps text-on-surface-variant">LAST_MAINT</th>
+<th class="px-4 py-3 font-label-caps text-label-caps text-on-surface-variant">ODOMETER</th>
+<th class="px-4 py-3 font-label-caps text-label-caps text-on-surface-variant text-right">ACTIONS</th>
+</tr>
+</thead>
+<tbody class="font-mono-data text-mono-data divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-4 py-3 text-primary">#TO-9928-V</td>
+<td class="px-4 py-3">FREIGHTLINER M2 106</td>
+<td class="px-4 py-3">TX-882-PQA</td>
+<td class="px-4 py-3">
+<span class="custom-status-pill border border-emerald-500/50 text-emerald-500 bg-emerald-500/5">AVAILABLE</span>
+</td>
+<td class="px-4 py-3 text-on-surface-variant">2023-11-12</td>
+<td class="px-4 py-3">142,281 KM</td>
+<td class="px-4 py-3 text-right">
+<button class="material-symbols-outlined text-outline-variant hover:text-primary transition-colors text-[20px]">more_vert</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-4 py-3 text-primary">#TO-8112-V</td>
+<td class="px-4 py-3">MERCEDES SPRINTER 2500</td>
+<td class="px-4 py-3">TX-441-BBS</td>
+<td class="px-4 py-3">
+<span class="custom-status-pill border border-blue-500/50 text-blue-500 bg-blue-500/5">ON TRIP</span>
+</td>
+<td class="px-4 py-3 text-on-surface-variant">2023-12-01</td>
+<td class="px-4 py-3">89,112 KM</td>
+<td class="px-4 py-3 text-right">
+<button class="material-symbols-outlined text-outline-variant hover:text-primary transition-colors text-[20px]">more_vert</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-4 py-3 text-primary">#TO-1044-V</td>
+<td class="px-4 py-3">KENWORTH T680</td>
+<td class="px-4 py-3">TX-009-LKK</td>
+<td class="px-4 py-3">
+<span class="custom-status-pill border border-amber-500/50 text-amber-500 bg-amber-500/5">IN SHOP</span>
+</td>
+<td class="px-4 py-3 text-on-surface-variant">2024-01-05</td>
+<td class="px-4 py-3">342,900 KM</td>
+<td class="px-4 py-3 text-right">
+<button class="material-symbols-outlined text-outline-variant hover:text-primary transition-colors text-[20px]">more_vert</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-4 py-3 text-primary">#TO-4552-V</td>
+<td class="px-4 py-3">ISUZU N-SERIES</td>
+<td class="px-4 py-3">TX-112-MMZ</td>
+<td class="px-4 py-3">
+<span class="custom-status-pill border border-emerald-500/50 text-emerald-500 bg-emerald-500/5">AVAILABLE</span>
+</td>
+<td class="px-4 py-3 text-on-surface-variant">2023-10-22</td>
+<td class="px-4 py-3">210,014 KM</td>
+<td class="px-4 py-3 text-right">
+<button class="material-symbols-outlined text-outline-variant hover:text-primary transition-colors text-[20px]">more_vert</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-4 py-3 text-primary">#TO-2019-V</td>
+<td class="px-4 py-3">HINO 268</td>
+<td class="px-4 py-3">TX-551-GHJ</td>
+<td class="px-4 py-3">
+<span class="custom-status-pill border border-rose-500/50 text-rose-500 bg-rose-500/5">RETIRED</span>
+</td>
+<td class="px-4 py-3 text-on-surface-variant">2023-08-15</td>
+<td class="px-4 py-3">561,001 KM</td>
+<td class="px-4 py-3 text-right">
+<button class="material-symbols-outlined text-outline-variant hover:text-primary transition-colors text-[20px]">more_vert</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-4 py-3 text-primary">#TO-9930-V</td>
+<td class="px-4 py-3">FREIGHTLINER M2 106</td>
+<td class="px-4 py-3">TX-773-XYZ</td>
+<td class="px-4 py-3">
+<span class="custom-status-pill border border-emerald-500/50 text-emerald-500 bg-emerald-500/5">AVAILABLE</span>
+</td>
+<td class="px-4 py-3 text-on-surface-variant">2023-11-20</td>
+<td class="px-4 py-3">131,442 KM</td>
+<td class="px-4 py-3 text-right">
+<button class="material-symbols-outlined text-outline-variant hover:text-primary transition-colors text-[20px]">more_vert</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Dashboard Style Stats Cards (Bento) -->
+<div class="grid grid-cols-12 gap-gutter mt-gutter">
+<div class="col-span-12 md:col-span-3 bg-surface-container border border-outline-variant p-4">
+<div class="font-label-caps text-label-caps text-on-surface-variant mb-2">FLEET_UPTIME</div>
+<div class="font-display-lg text-display-lg text-primary">94.2%</div>
+<div class="mt-2 h-1 bg-outline-variant">
+<div class="h-full bg-primary w-[94.2%]"></div>
+</div>
+</div>
+<div class="col-span-12 md:col-span-6 bg-surface-container border border-outline-variant p-4 flex gap-8">
+<div class="flex-1">
+<div class="font-label-caps text-label-caps text-on-surface-variant mb-2">MAINTENANCE_BURN_RATE</div>
+<div class="flex items-end gap-2">
+<div class="w-2 bg-primary h-8"></div>
+<div class="w-2 bg-outline h-12"></div>
+<div class="w-2 bg-primary h-10"></div>
+<div class="w-2 bg-outline h-16"></div>
+<div class="w-2 bg-primary h-6"></div>
+<div class="w-2 bg-outline h-14"></div>
+<div class="w-2 bg-primary h-12"></div>
+</div>
+</div>
+<div class="flex-1 border-l border-outline-variant pl-8">
+<div class="font-label-caps text-label-caps text-on-surface-variant mb-2">AVG_IDLE_TIME</div>
+<div class="font-headline-md text-headline-md text-primary">12.4 MIN</div>
+<div class="text-[10px] text-on-tertiary-container mt-1">▽ 2.1% FROM LAST WEEK</div>
+</div>
+</div>
+<div class="col-span-12 md:col-span-3 bg-primary p-4">
+<div class="font-label-caps text-label-caps text-on-primary mb-2">SYSTEM_NOTICES</div>
+<div class="text-on-primary font-body-md text-[12px] leading-tight">
+                        3 vehicles require immediate tier-2 inspection. Maintenance scheduled for Node-7.
+                    </div>
+<button class="mt-4 w-full border border-on-primary py-2 text-[10px] font-bold text-on-primary hover:bg-on-primary hover:text-primary transition-colors">
+                        VIEW QUEUE
+                    </button>
+</div>
+</div>
+<!-- Background Grid Visualization -->
+<div class="absolute bottom-0 right-0 p-gutter opacity-10 pointer-events-none select-none">
+<div class="font-display-lg text-[120px] font-bold tracking-tighter leading-none">REG_01</div>
+</div>
+</main>
+<!-- Side Panel: Add Vehicle Form -->
+<div class="side-panel fixed top-0 right-0 h-full w-[400px] bg-surface-container-low border-l border-white z-50 p-8 shadow-2xl" id="addVehiclePanel">
+<div class="flex justify-between items-center mb-10">
+<h2 class="font-headline-sm text-headline-sm text-primary tracking-tighter">NEW_VEHICLE_ENTRY</h2>
+<button class="material-symbols-outlined text-outline-variant hover:text-primary transition-colors" onclick="toggleSidePanel()">close</button>
+</div>
+<form class="space-y-6">
+<div>
+<label class="font-label-caps text-label-caps text-on-surface-variant mb-2 block">PRIMARY_IDENTIFIER</label>
+<input class="w-full bg-background border border-outline-variant focus:border-primary text-on-surface p-3 outline-none transition-colors" placeholder="e.g. TO-XXXX-V" type="text"/>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="font-label-caps text-label-caps text-on-surface-variant mb-2 block">MANUFACTURER</label>
+<select class="w-full bg-background border border-outline-variant focus:border-primary text-on-surface p-3 outline-none transition-colors appearance-none">
+<option>FREIGHTLINER</option>
+<option>KENWORTH</option>
+<option>ISUZU</option>
+<option>MERCEDES</option>
+</select>
+</div>
+<div>
+<label class="font-label-caps text-label-caps text-on-surface-variant mb-2 block">MODEL_YEAR</label>
+<input class="w-full bg-background border border-outline-variant focus:border-primary text-on-surface p-3 outline-none transition-colors" placeholder="2024" type="number"/>
+</div>
+</div>
+<div>
+<label class="font-label-caps text-label-caps text-on-surface-variant mb-2 block">LICENSE_PLATE_NO</label>
+<input class="w-full bg-background border border-outline-variant focus:border-primary text-on-surface p-3 outline-none transition-colors" placeholder="TX-000-XXX" type="text"/>
+</div>
+<div>
+<label class="font-label-caps text-label-caps text-on-surface-variant mb-2 block">INITIAL_ODOMETER</label>
+<div class="flex items-center gap-0">
+<input class="flex-1 bg-background border border-outline-variant focus:border-primary text-on-surface p-3 outline-none transition-colors" placeholder="000,000" type="text"/>
+<div class="bg-surface-container-high border-y border-r border-outline-variant px-4 h-[50px] flex items-center font-label-caps text-[10px] text-outline-variant">KM</div>
+</div>
+</div>
+<div>
+<label class="font-label-caps text-label-caps text-on-surface-variant mb-2 block">ASSET_ASSIGNMENT</label>
+<div class="border border-outline-variant p-4 flex items-center justify-between hover:border-outline cursor-pointer transition-colors">
+<div class="font-label-caps text-[10px]">SELECT_TERMINAL_NODE</div>
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</div>
+</div>
+<div class="pt-10">
+<button class="w-full bg-primary text-on-primary py-4 font-label-caps text-label-caps hover:bg-on-surface transition-colors active:scale-[0.98]" type="submit">
+                        COMMIT_TO_REGISTRY
+                    </button>
+<button class="w-full mt-4 border border-outline-variant text-on-surface-variant py-4 font-label-caps text-label-caps hover:border-primary hover:text-primary transition-colors" onclick="toggleSidePanel()" type="button">
+                        CANCEL_ACTION
+                    </button>
+</div>
+</form>
+</div>
+<!-- Overlay -->
+<div class="fixed inset-0 bg-black/80 z-40 hidden backdrop-blur-sm" id="panelOverlay" onclick="toggleSidePanel()"></div>
+</div>
+<script>
+        function toggleSidePanel() {
+            const panel = document.getElementById('addVehiclePanel');
+            const overlay = document.getElementById('panelOverlay');
+            panel.classList.toggle('open');
+            overlay.classList.toggle('hidden');
+        }
+
+        // Micro-interaction: table row flicker on load
+        document.querySelectorAll('tbody tr').forEach((row, index) => {
+            row.style.opacity = '0';
+            setTimeout(() => {
+                row.style.transition = 'opacity 0.4s ease';
+                row.style.opacity = '1';
+            }, index * 80);
+        });
+    </script>
+</body></html>

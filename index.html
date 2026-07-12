@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TransitOps | Smart Transport Operations Platform</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="operational-frame" aria-hidden="true"></div>
+  <div class="grid-texture" aria-hidden="true"></div>
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <section id="loginView" class="auth-shell">
+    <div class="auth-panel">
+      <div class="brand-mark" aria-hidden="true"><span>TO</span></div>
+      <p class="eyebrow">Secure command interface v4.0.2</p>
+      <h1>TransitOps</h1>
+      <p class="auth-copy">
+        Select an operational profile and initiate a monitored transport
+        command session.
+      </p>
+
+      <div class="role-selector" aria-label="Operational role selector">
+        <button class="active" type="button" data-demo-email="admin@transitops.io">Admin</button>
+        <button type="button" data-demo-email="driver@transitops.io">Driver</button>
+        <button type="button" data-demo-email="finance@transitops.io">Finance</button>
+      </div>
+
+      <form id="loginForm" class="auth-form">
+        <label>
+          Operator identifier (email)
+          <input id="loginEmail" type="email" autocomplete="username" value="admin@transitops.io" required />
+        </label>
+        <label>
+          Access clearance (password)
+          <input id="loginPassword" type="password" autocomplete="current-password" value="demo123" required />
+        </label>
+        <button class="primary-action" type="submit">Initiate login sequence</button>
+      </form>
+
+      <div class="demo-users">
+        <p>Demo users</p>
+        <div id="demoUserList" class="demo-user-grid"></div>
+      </div>
+    </div>
+
+    <div class="auth-visual" aria-hidden="true">
+      <div class="route-board">
+        <div class="route-node depot">Depot</div>
+        <div class="route-line route-line-a"></div>
+        <div class="route-node hub">Hub</div>
+        <div class="route-line route-line-b"></div>
+        <div class="route-node shop">Shop</div>
+        <div class="vehicle-card moving-card">
+          <span class="vehicle-icon">V</span>
+          <strong>Van-05</strong>
+          <small>Ready for dispatch</small>
+        </div>
+        <div class="visual-kpi">
+          <span>Fleet utilization</span>
+          <strong>68%</strong>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main id="appShell" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div>
+          <strong>TransitOps</strong>
+          <small>Command Center</small>
+        </div>
+      </div>
+      <nav id="navList" class="nav-list" aria-label="Primary"></nav>
+      <div class="session-card">
+        <span id="sessionRole"></span>
+        <strong id="sessionName"></strong>
+        <button id="logoutButton" class="ghost-action" type="button">Sign out</button>
+      </div>
+    </aside>
+
+    <section class="workspace">
+      <header class="topbar">
+        <div class="topbar-left">
+          <h2 id="viewTitle">Command Center</h2>
+          <nav class="role-tabs" aria-label="Operational roles">
+            <span class="active">Driver</span>
+            <span>Dispatcher</span>
+            <span>Admin</span>
+          </nav>
+          <span id="commandClock" class="command-clock">--:--:--</span>
+        </div>
+        <div class="topbar-actions">
+          <label class="command-search">
+            <span>CMD_FIND</span>
+            <input type="search" placeholder="SEARCH" aria-label="Command search" />
+          </label>
+          <button id="themeToggle" class="icon-action" type="button" title="Toggle dark mode" aria-label="Toggle dark mode">SYS</button>
+          <button id="resetDemo" class="secondary-action" type="button">Reset</button>
+        </div>
+      </header>
+      <p id="viewEyebrow" class="eyebrow view-kicker">Dashboard</p>
+
+      <div id="appRoot" class="view-root"></div>
+    </section>
+  </main>
+
+  <script src="./app.js" defer></script>
+</body>
+</html>

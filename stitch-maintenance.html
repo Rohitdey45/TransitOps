@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TRANSITOPS | Maintenance Command Center</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #141313;
+            color: #e5e2e1;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        /* Rigid operational frame */
+        .operational-frame {
+            border: 1px solid #FFFFFF;
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 100;
+        }
+        /* Grid Texture Overlay */
+        .grid-texture {
+            background-image: radial-gradient(circle, #ffffff 1px, transparent 1px);
+            background-size: 32px 32px;
+            opacity: 0.05;
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar for high-density tables */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #141313;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333333;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #FFFFFF;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "background": "#141313",
+                        "on-tertiary-container": "#636565",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-background": "#e5e2e1",
+                        "secondary-fixed-dim": "#c8c6c6",
+                        "on-primary": "#2f3131",
+                        "on-secondary-fixed-variant": "#474747",
+                        "on-surface": "#e5e2e1",
+                        "on-tertiary": "#2f3131",
+                        "surface-container-low": "#1c1b1b",
+                        "inverse-surface": "#e5e2e1",
+                        "on-primary-container": "#636565",
+                        "on-surface-variant": "#c4c7c8",
+                        "on-error": "#690005",
+                        "secondary-container": "#474747",
+                        "secondary-fixed": "#e4e2e1",
+                        "inverse-on-surface": "#313030",
+                        "on-primary-fixed": "#1a1c1c",
+                        "error": "#ffb4ab",
+                        "error-container": "#93000a",
+                        "surface-dim": "#141313",
+                        "surface-container-highest": "#353434",
+                        "secondary": "#c8c6c6",
+                        "surface-variant": "#353434",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-tint": "#c6c6c7",
+                        "primary-container": "#e2e2e2",
+                        "tertiary-container": "#e2e2e2",
+                        "primary-fixed-dim": "#c6c6c7",
+                        "primary": "#ffffff",
+                        "on-primary-fixed-variant": "#454747",
+                        "on-secondary-fixed": "#1b1c1c",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "on-secondary": "#303030",
+                        "surface-container": "#201f1f",
+                        "surface": "#141313",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "tertiary-fixed": "#e2e2e2",
+                        "outline": "#8e9192",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "outline-variant": "#444748",
+                        "surface-bright": "#3a3939",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-container": "#b6b5b4",
+                        "tertiary": "#ffffff",
+                        "inverse-primary": "#5d5f5f",
+                        "primary-fixed": "#e2e2e2"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "0px"
+                    },
+                    "spacing": {
+                        "margin-page": "24px",
+                        "unit": "4px",
+                        "grid-size": "32px",
+                        "container-padding": "12px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "mono-data": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-caps": ["10px", {"lineHeight": "1", "letterSpacing": "0.15em", "fontWeight": "800"}],
+                        "mono-data": ["13px", {"lineHeight": "1", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                        "headline-sm": ["18px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background selection:bg-primary selection:text-background">
+<div class="operational-frame"></div>
+<div class="grid-texture"></div>
+<!-- Sidebar Navigation Shell -->
+<aside class="flex flex-col fixed left-0 top-0 h-full z-40 bg-background w-64 border-r border-outline-variant" id="SideNav">
+<div class="p-6 border-b border-outline-variant">
+<h1 class="font-headline-md text-headline-md font-bold tracking-tighter text-primary">TRANSITOPS</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant opacity-60">COMMAND CENTER</p>
+</div>
+<nav class="flex-1 py-4 overflow-y-auto">
+<!-- Navigation Items Mapping from JSON -->
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:text-primary border-l-2 border-transparent hover:border-primary transition-all font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span> DASHBOARD
+            </a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:text-primary border-l-2 border-transparent hover:border-primary transition-all font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined text-[20px]">directions_bus</span> VEHICLES
+            </a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:text-primary border-l-2 border-transparent hover:border-primary transition-all font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined text-[20px]">person_pin</span> DRIVERS
+            </a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:text-primary border-l-2 border-transparent hover:border-primary transition-all font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined text-[20px]">route</span> TRIPS
+            </a>
+<a class="flex items-center gap-3 px-6 py-3 bg-primary text-on-primary border-l-2 border-primary transition-all font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined text-[20px]">build</span> MAINTENANCE
+            </a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:text-primary border-l-2 border-transparent hover:border-primary transition-all font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined text-[20px]">payments</span> EXPENSES
+            </a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:text-primary border-l-2 border-transparent hover:border-primary transition-all font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined text-[20px]">analytics</span> ANALYTICS
+            </a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:text-primary border-l-2 border-transparent hover:border-primary transition-all font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined text-[20px]">description</span> DOCUMENTS
+            </a>
+</nav>
+<div class="p-4 border-t border-outline-variant bg-surface-container-lowest">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-primary-container text-on-primary-container flex items-center justify-center font-bold">JD</div>
+<div>
+<p class="font-mono-data text-[12px] text-primary">J. DANVERS</p>
+<p class="font-label-caps text-[10px] text-on-surface-variant">LOGISTICS LEAD</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 right-0 left-64 h-16 bg-background flex justify-between items-center px-8 z-30 border-b border-outline-variant">
+<div class="flex items-center gap-8">
+<h2 class="font-headline-sm text-headline-sm font-bold text-primary tracking-widest uppercase">Maintenance Logs</h2>
+<div class="flex gap-6">
+<span class="font-label-caps text-label-caps text-primary border-b border-primary cursor-pointer pb-1">DRIVER</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary cursor-pointer pb-1 transition-colors">DISPATCHER</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary cursor-pointer pb-1 transition-colors">ADMIN</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-all">
+<span class="material-symbols-outlined">logout</span>
+</button>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="ml-64 mt-16 p-8 min-h-screen relative z-10">
+<!-- Dashboard Header / KPIs -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+<div class="border border-outline-variant p-4 bg-surface-container-low">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-2">QUEUE TOTAL</p>
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg text-primary">14</span>
+<span class="font-mono-data text-on-surface-variant text-[12px]">+2 IN 24H</span>
+</div>
+</div>
+<div class="border border-outline-variant p-4 bg-surface-container-low border-l-4 border-l-primary">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-2">ACTIVE IN SHOP</p>
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg text-primary">06</span>
+<span class="font-mono-data text-on-surface-variant text-[12px]">AT CAPACITY</span>
+</div>
+</div>
+<div class="border border-outline-variant p-4 bg-surface-container-low">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-2">COMPLETED TODAY</p>
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg text-primary">09</span>
+<span class="font-mono-data text-on-surface-variant text-[12px]">82% EFFICIENCY</span>
+</div>
+</div>
+<div class="border border-outline-variant p-4 bg-surface-container-low">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-2">AVG TURNAROUND</p>
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg text-primary">4.2</span>
+<span class="font-mono-data text-on-surface-variant text-[12px]">HOURS</span>
+</div>
+</div>
+</div>
+<!-- Maintenance Queue & Active Logs -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+<!-- Left Column: Queue -->
+<div class="lg:col-span-1">
+<div class="flex justify-between items-end mb-4">
+<h3 class="font-headline-sm text-headline-sm font-bold text-primary">SERVICE QUEUE</h3>
+<span class="font-label-caps text-[10px] text-on-surface-variant">PRIORITY SORTED</span>
+</div>
+<div class="space-y-3" id="queue-container">
+<!-- Queue Item 1 -->
+<div class="bg-surface-container p-4 border border-outline-variant hover:border-primary transition-colors cursor-pointer group" onclick="moveInShop(this)">
+<div class="flex justify-between items-start mb-2">
+<span class="font-mono-data text-primary text-[14px]">BUS-7742</span>
+<span class="text-[10px] px-2 py-0.5 bg-error-container text-on-error-container font-bold">URGENT</span>
+</div>
+<p class="font-body-md text-on-surface-variant mb-3">Transmission fluid leak reported during terminal approach.</p>
+<div class="flex justify-between items-center">
+<span class="font-label-caps text-[10px] text-outline">POSTED 2H AGO</span>
+<button class="bg-primary text-background px-3 py-1 font-label-caps text-[10px] hover:bg-on-surface transition-colors">MOVE TO IN SHOP</button>
+</div>
+</div>
+<!-- Queue Item 2 -->
+<div class="bg-surface-container p-4 border border-outline-variant hover:border-primary transition-colors cursor-pointer group" onclick="moveInShop(this)">
+<div class="flex justify-between items-start mb-2">
+<span class="font-mono-data text-primary text-[14px]">VAN-109</span>
+<span class="text-[10px] px-2 py-0.5 bg-surface-container-highest text-on-surface-variant font-bold">ROUTINE</span>
+</div>
+<p class="font-body-md text-on-surface-variant mb-3">Scheduled 50k mile engine diagnostics and brake pad inspection.</p>
+<div class="flex justify-between items-center">
+<span class="font-label-caps text-[10px] text-outline">POSTED 5H AGO</span>
+<button class="bg-primary text-background px-3 py-1 font-label-caps text-[10px] hover:bg-on-surface transition-colors">MOVE TO IN SHOP</button>
+</div>
+</div>
+<!-- Queue Item 3 -->
+<div class="bg-surface-container p-4 border border-outline-variant hover:border-primary transition-colors cursor-pointer group" onclick="moveInShop(this)">
+<div class="flex justify-between items-start mb-2">
+<span class="font-mono-data text-primary text-[14px]">BUS-8811</span>
+<span class="text-[10px] px-2 py-0.5 bg-secondary-container text-on-secondary-container font-bold">MINOR</span>
+</div>
+<p class="font-body-md text-on-surface-variant mb-3">HVAC system malfunction in rear cabin area.</p>
+<div class="flex justify-between items-center">
+<span class="font-label-caps text-[10px] text-outline">POSTED 8H AGO</span>
+<button class="bg-primary text-background px-3 py-1 font-label-caps text-[10px] hover:bg-on-surface transition-colors">MOVE TO IN SHOP</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Active Logs & Stats -->
+<div class="lg:col-span-2 space-y-8">
+<!-- Active Maintenance Logs Table -->
+<div class="border border-outline-variant bg-surface-container-low overflow-hidden">
+<div class="p-4 bg-surface-container border-b border-outline-variant flex justify-between items-center">
+<h3 class="font-headline-sm text-headline-sm font-bold text-primary">IN SHOP / ACTIVE LOGS</h3>
+<div class="flex gap-2">
+<span class="w-2 h-2 bg-primary animate-pulse"></span>
+<span class="font-label-caps text-[10px] text-primary">6 STATIONS ACTIVE</span>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left font-mono-data text-[13px]">
+<thead>
+<tr class="bg-surface-container-highest border-b border-outline-variant">
+<th class="px-4 py-3 font-label-caps text-[10px] text-on-surface-variant">VEHICLE ID</th>
+<th class="px-4 py-3 font-label-caps text-[10px] text-on-surface-variant">ISSUE / FAULT</th>
+<th class="px-4 py-3 font-label-caps text-[10px] text-on-surface-variant">TECHNICIAN</th>
+<th class="px-4 py-3 font-label-caps text-[10px] text-on-surface-variant">EST. COMPLETION</th>
+<th class="px-4 py-3 font-label-caps text-[10px] text-on-surface-variant text-right">STATUS</th>
+</tr>
+</thead>
+<tbody id="active-logs-body">
+<tr class="border-b border-outline-variant hover:bg-surface-container-highest transition-colors">
+<td class="px-4 py-4 text-primary">BUS-4421</td>
+<td class="px-4 py-4">Engine Overheating / Coolant Flush</td>
+<td class="px-4 py-4">M. RIVERA</td>
+<td class="px-4 py-4">14:30 (UTC-5)</td>
+<td class="px-4 py-4 text-right"><span class="text-[11px] px-2 py-0.5 border border-primary text-primary">65% PROGRESS</span></td>
+</tr>
+<tr class="border-b border-outline-variant hover:bg-surface-container-highest transition-colors">
+<td class="px-4 py-4 text-primary">TRK-092</td>
+<td class="px-4 py-4">Axle Alignment &amp; Tire Rotation</td>
+<td class="px-4 py-4">S. CHEN</td>
+<td class="px-4 py-4">15:15 (UTC-5)</td>
+<td class="px-4 py-4 text-right"><span class="text-[11px] px-2 py-0.5 border border-primary text-primary">40% PROGRESS</span></td>
+</tr>
+<tr class="border-b border-outline-variant hover:bg-surface-container-highest transition-colors">
+<td class="px-4 py-4 text-primary">BUS-1104</td>
+<td class="px-4 py-4">Electrical Harness Replacement</td>
+<td class="px-4 py-4">J. SMITH</td>
+<td class="px-4 py-4">18:00 (UTC-5)</td>
+<td class="px-4 py-4 text-right"><span class="text-[11px] px-2 py-0.5 border border-primary text-primary">15% PROGRESS</span></td>
+</tr>
+<tr class="border-b border-outline-variant hover:bg-surface-container-highest transition-colors">
+<td class="px-4 py-4 text-primary">VAN-402</td>
+<td class="px-4 py-4">Fuel Injection System Service</td>
+<td class="px-4 py-4">A. VOGEL</td>
+<td class="px-4 py-4">16:45 (UTC-5)</td>
+<td class="px-4 py-4 text-right"><span class="text-[11px] px-2 py-0.5 border border-primary text-primary">90% PROGRESS</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Downtime Chart Section -->
+<div class="border border-outline-variant bg-surface-container-low p-6">
+<div class="flex justify-between items-center mb-8">
+<div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-primary">AVERAGE DOWNTIME</h3>
+<p class="font-label-caps text-[10px] text-on-surface-variant">HOURS PER VEHICLE CLASS (LTM)</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 bg-primary"></div>
+<span class="font-label-caps text-[10px] text-on-surface-variant">TARGET</span>
+</div>
+</div>
+</div>
+<div class="h-48 flex items-end gap-1 px-4 relative">
+<!-- Horizontal Grid Lines -->
+<div class="absolute inset-x-0 top-0 h-[1px] bg-outline-variant opacity-30"></div>
+<div class="absolute inset-x-0 top-1/4 h-[1px] bg-outline-variant opacity-30"></div>
+<div class="absolute inset-x-0 top-1/2 h-[1px] bg-outline-variant opacity-30"></div>
+<div class="absolute inset-x-0 top-3/4 h-[1px] bg-outline-variant opacity-30"></div>
+<!-- Bars -->
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-[#333333] hover:bg-primary transition-all duration-300 relative" style="height: 85%;">
+<div class="absolute -top-6 left-1/2 -translate-x-1/2 font-mono-data text-[10px] text-primary opacity-0 group-hover:opacity-100">8.5h</div>
+</div>
+<span class="font-label-caps text-[10px] text-on-surface-variant">HEAVY BUS</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-[#666666] hover:bg-primary transition-all duration-300 relative" style="height: 40%;">
+<div class="absolute -top-6 left-1/2 -translate-x-1/2 font-mono-data text-[10px] text-primary opacity-0 group-hover:opacity-100">4.0h</div>
+</div>
+<span class="font-label-caps text-[10px] text-on-surface-variant">METRO VAN</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-[#999999] hover:bg-primary transition-all duration-300 relative" style="height: 65%;">
+<div class="absolute -top-6 left-1/2 -translate-x-1/2 font-mono-data text-[10px] text-primary opacity-0 group-hover:opacity-100">6.5h</div>
+</div>
+<span class="font-label-caps text-[10px] text-on-surface-variant">SERVICE TRK</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-primary hover:bg-white transition-all duration-300 relative" style="height: 25%;">
+<div class="absolute -top-6 left-1/2 -translate-x-1/2 font-mono-data text-[10px] text-primary opacity-0 group-hover:opacity-100">2.5h</div>
+</div>
+<span class="font-label-caps text-[10px] text-on-surface-variant">E-SHUTTLE</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-[#333333] hover:bg-primary transition-all duration-300 relative" style="height: 55%;">
+<div class="absolute -top-6 left-1/2 -translate-x-1/2 font-mono-data text-[10px] text-primary opacity-0 group-hover:opacity-100">5.5h</div>
+</div>
+<span class="font-label-caps text-[10px] text-on-surface-variant">LRT UNIT</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- System Logs / Audit Trail - Bento Style Section -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<div class="border border-outline-variant bg-surface-container p-4">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-[16px] text-primary">history</span>
+<span class="font-label-caps text-[10px] text-primary">AUDIT LOG</span>
+</div>
+<div class="space-y-2 opacity-60">
+<p class="font-mono-data text-[11px]">[10:04] PART_REQ: BUS-4421 Filter Kit</p>
+<p class="font-mono-data text-[11px]">[09:42] TECH_ASSN: S.CHEN -&gt; TRK-092</p>
+</div>
+</div>
+<div class="border border-outline-variant bg-surface-container p-4">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-[16px] text-primary">inventory_2</span>
+<span class="font-label-caps text-[10px] text-primary">PARTS STOCK</span>
+</div>
+<p class="font-mono-data text-[11px] mb-1">CRITICAL: Brake Pads (Front) <span class="text-error">LOW</span></p>
+<div class="w-full h-1 bg-outline-variant">
+<div class="bg-error h-full" style="width: 15%"></div>
+</div>
+</div>
+<div class="border border-outline-variant bg-surface-container-highest p-4 flex flex-col justify-center items-center text-center">
+<span class="material-symbols-outlined text-[24px] text-primary mb-2">add_circle</span>
+<p class="font-label-caps text-[10px] text-primary">CREATE NEW<br/>MAINTENANCE TICKET</p>
+</div>
+<div class="border border-outline-variant bg-primary p-4 flex flex-col justify-center items-center text-center group cursor-pointer hover:bg-white transition-colors">
+<p class="font-label-caps text-[10px] text-background mb-1">GENERATING REPORT</p>
+<span class="material-symbols-outlined text-[24px] text-background">file_download</span>
+</div>
+</div>
+</main>
+<!-- Contextual Toast / Feedback Container -->
+<div class="fixed bottom-8 right-8 bg-primary text-background px-6 py-3 font-mono-data text-[13px] translate-y-24 opacity-0 transition-all duration-300 z-50" id="toast">
+        VEHICLE MOVED TO IN-SHOP
+    </div>
+<script>
+        function moveInShop(element) {
+            // Get data from the queue item
+            const vehicleId = element.querySelector('.font-mono-data').innerText;
+            const issueText = element.querySelector('.font-body-md').innerText;
+            
+            // Add to the table
+            const tableBody = document.getElementById('active-logs-body');
+            const newRow = document.createElement('tr');
+            newRow.className = "border-b border-outline-variant hover:bg-surface-container-highest transition-colors opacity-0 translate-x-4";
+            
+            // Random technician and time for demo
+            const techs = ["P. GOMEZ", "L. WALKER", "K. JENSEN", "B. HOOD"];
+            const randomTech = techs[Math.floor(Math.random() * techs.length)];
+            const time = "19:00 (UTC-5)";
+            
+            newRow.innerHTML = `
+                <td class="px-4 py-4 text-primary">${vehicleId}</td>
+                <td class="px-4 py-4">${issueText}</td>
+                <td class="px-4 py-4">${randomTech}</td>
+                <td class="px-4 py-4">${time}</td>
+                <td class="px-4 py-4 text-right"><span class="text-[11px] px-2 py-0.5 border border-primary text-primary">INITIALIZING</span></td>
+            `;
+            
+            // Add to table
+            tableBody.prepend(newRow);
+            
+            // Remove from queue with animation
+            element.classList.add('opacity-0', '-translate-x-8');
+            setTimeout(() => {
+                element.remove();
+                // Animate new row in
+                newRow.classList.remove('opacity-0', 'translate-x-4');
+                newRow.classList.add('opacity-100', 'translate-x-0');
+            }, 300);
+
+            // Toast feedback
+            const toast = document.getElementById('toast');
+            toast.innerText = `${vehicleId} MOVED TO IN-SHOP`;
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body></html>

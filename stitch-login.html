@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TransitOps | Command Center Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "background": "#141313",
+                    "on-tertiary-container": "#636565",
+                    "surface-container-lowest": "#0e0e0e",
+                    "on-background": "#e5e2e1",
+                    "secondary-fixed-dim": "#c8c6c6",
+                    "on-primary": "#2f3131",
+                    "on-secondary-fixed-variant": "#474747",
+                    "on-surface": "#e5e2e1",
+                    "on-tertiary": "#2f3131",
+                    "surface-container-low": "#1c1b1b",
+                    "inverse-surface": "#e5e2e1",
+                    "on-primary-container": "#636565",
+                    "on-surface-variant": "#c4c7c8",
+                    "on-error": "#690005",
+                    "secondary-container": "#474747",
+                    "secondary-fixed": "#e4e2e1",
+                    "inverse-on-surface": "#313030",
+                    "on-primary-fixed": "#1a1c1c",
+                    "error": "#ffb4ab",
+                    "error-container": "#93000a",
+                    "surface-dim": "#141313",
+                    "surface-container-highest": "#353434",
+                    "secondary": "#c8c6c6",
+                    "surface-variant": "#353434",
+                    "surface-container-high": "#2a2a2a",
+                    "surface-tint": "#c6c6c7",
+                    "primary-container": "#e2e2e2",
+                    "tertiary-container": "#e2e2e2",
+                    "primary-fixed-dim": "#c6c6c7",
+                    "primary": "#ffffff",
+                    "on-primary-fixed-variant": "#454747",
+                    "on-secondary-fixed": "#1b1c1c",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "on-secondary": "#303030",
+                    "surface-container": "#201f1f",
+                    "surface": "#141313",
+                    "on-tertiary-fixed-variant": "#454747",
+                    "tertiary-fixed": "#e2e2e2",
+                    "outline": "#8e9192",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "outline-variant": "#444748",
+                    "surface-bright": "#3a3939",
+                    "on-error-container": "#ffdad6",
+                    "on-secondary-container": "#b6b5b4",
+                    "tertiary": "#ffffff",
+                    "inverse-primary": "#5d5f5f",
+                    "primary-fixed": "#e2e2e2"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0px",
+                    "lg": "0px",
+                    "xl": "0px",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-page": "24px",
+                    "unit": "4px",
+                    "grid-size": "32px",
+                    "container-padding": "12px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "mono-data": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                    "mono-data": ["14px", {"lineHeight": "1", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "headline-sm": ["18px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #101010;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 32px 32px;
+            overflow: hidden;
+        }
+        
+        .operational-frame {
+            position: fixed;
+            inset: 12px;
+            border: 1px solid #FFFFFF;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .scanline {
+            width: 100%;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.05);
+            position: absolute;
+            animation: scan 8s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        .role-selector input:checked + label {
+            background-color: #ffffff;
+            color: #101010;
+            border-color: #ffffff;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen text-on-surface font-body-md relative">
+<!-- Outer Operational Frame -->
+<div class="operational-frame"></div>
+<div class="scanline"></div>
+<!-- Background Decorative Elements -->
+<div class="absolute inset-0 z-0 opacity-20 flex items-center justify-center">
+<div class="w-[800px] h-[800px] border border-outline-variant rotate-45 pointer-events-none"></div>
+<div class="w-[600px] h-[600px] border border-outline-variant -rotate-12 pointer-events-none absolute"></div>
+</div>
+<!-- Login Container -->
+<main class="relative z-10 w-full max-w-md p-gutter">
+<div class="bg-surface-container-lowest border border-primary p-10 shadow-2xl relative">
+<!-- Corner Accents -->
+<div class="absolute -top-[1px] -left-[1px] w-4 h-4 border-t-2 border-l-2 border-primary"></div>
+<div class="absolute -bottom-[1px] -right-[1px] w-4 h-4 border-b-2 border-r-2 border-primary"></div>
+<!-- Header -->
+<header class="mb-8 text-center">
+<h1 class="font-headline-md text-headline-md font-extrabold tracking-[0.2em] text-primary mb-2">
+                    TRANSITOPS
+                </h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant">
+                    SECURE COMMAND INTERFACE v4.0.2
+                </p>
+</header>
+<!-- Role Selection -->
+<div class="mb-8">
+<p class="font-label-caps text-label-caps mb-3 text-center text-on-surface-variant">SELECT OPERATIONAL ROLE</p>
+<div class="grid grid-cols-3 gap-2 role-selector">
+<div class="relative">
+<input checked="" class="sr-only" id="role-admin" name="role" type="radio"/>
+<label class="flex flex-col items-center justify-center py-3 border border-outline-variant cursor-pointer transition-all font-label-caps text-label-caps hover:border-primary" for="role-admin">
+<span class="material-symbols-outlined mb-1">admin_panel_settings</span>
+                            ADMIN
+                        </label>
+</div>
+<div class="relative">
+<input class="sr-only" id="role-dispatcher" name="role" type="radio"/>
+<label class="flex flex-col items-center justify-center py-3 border border-outline-variant cursor-pointer transition-all font-label-caps text-label-caps hover:border-primary" for="role-dispatcher">
+<span class="material-symbols-outlined mb-1">dashboard</span>
+                            DISPATCH
+                        </label>
+</div>
+<div class="relative">
+<input class="sr-only" id="role-driver" name="role" type="radio"/>
+<label class="flex flex-col items-center justify-center py-3 border border-outline-variant cursor-pointer transition-all font-label-caps text-label-caps hover:border-primary" for="role-driver">
+<span class="material-symbols-outlined mb-1">directions_bus</span>
+                            DRIVER
+                        </label>
+</div>
+</div>
+</div>
+<!-- Form -->
+<form class="space-y-6" id="loginForm" onsubmit="return handleLogin(event)">
+<div class="space-y-1.5">
+<label class="block font-label-caps text-label-caps text-on-surface-variant" for="email">OPERATOR IDENTIFIER (EMAIL)</label>
+<div class="relative group">
+<input class="w-full bg-background border border-outline-variant px-4 py-3 focus:outline-none focus:border-primary text-primary transition-colors font-mono-data" id="email" placeholder="ID_SEQUENCE@TRANSITOPS.COM" required="" type="email"/>
+</div>
+</div>
+<div class="space-y-1.5">
+<label class="block font-label-caps text-label-caps text-on-surface-variant" for="password">ACCESS CLEARANCE (PASSWORD)</label>
+<div class="relative group">
+<input class="w-full bg-background border border-outline-variant px-4 py-3 focus:outline-none focus:border-primary text-primary transition-colors font-mono-data" id="password" placeholder="••••••••" required="" type="password"/>
+</div>
+</div>
+<div class="flex items-center justify-between pt-2">
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="w-4 h-4 rounded-none border-outline-variant bg-background text-primary focus:ring-0 checked:bg-primary" type="checkbox"/>
+<span class="font-label-caps text-[10px] text-on-surface-variant group-hover:text-primary">RETAIN SESSION</span>
+</label>
+<a class="font-label-caps text-[10px] text-on-surface-variant hover:text-primary transition-colors underline underline-offset-4" href="#">RECOVERY PROTOCOL</a>
+</div>
+<button class="w-full bg-primary text-on-primary py-4 font-label-caps text-label-caps tracking-widest hover:bg-on-surface-variant active:scale-[0.98] transition-all flex items-center justify-center gap-2" type="submit">
+<span class="material-symbols-outlined text-sm">login</span>
+                    INITIATE LOGIN SEQUENCE
+                </button>
+</form>
+<!-- Status Footer -->
+<div class="mt-8 pt-6 border-t border-outline-variant flex justify-between items-center opacity-60">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 bg-emerald-500 animate-pulse"></div>
+<span class="font-label-caps text-[10px] uppercase">System: Operational</span>
+</div>
+<span class="font-label-caps text-[10px] uppercase">Node: 42-X-GAMMA</span>
+</div>
+</div>
+<!-- External Security Notice -->
+<div class="mt-8 text-center">
+<p class="font-label-caps text-[9px] text-on-surface-variant leading-relaxed max-w-xs mx-auto">
+                UNAUTHORIZED ACCESS IS STRICTLY PROHIBITED UNDER PROTOCOL 84-B. ALL SESSION DATA IS ENCRYPTED AND LOGGED.
+            </p>
+</div>
+</main>
+<!-- UI Interaction Scripts -->
+<script>
+        function handleLogin(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalContent = btn.innerHTML;
+            
+            // Visual feedback for interaction
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> AUTHENTICATING...';
+            
+            setTimeout(() => {
+                btn.innerHTML = '<span class="material-symbols-outlined">check_circle</span> ACCESS GRANTED';
+                btn.style.backgroundColor = '#10b981'; // Temporary success state
+                btn.style.color = '#ffffff';
+                
+                setTimeout(() => {
+                    alert('Command Center access simulated. Redirection protocol initiated.');
+                    btn.disabled = false;
+                    btn.innerHTML = originalContent;
+                    btn.style.backgroundColor = '';
+                    btn.style.color = '';
+                }, 1000);
+            }, 1500);
+
+            return false;
+        }
+
+        // Lightweight atmospheric effect for input fields
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.parentElement.querySelector('label').style.color = '#FFFFFF';
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.parentElement.querySelector('label').style.color = '';
+            });
+        });
+    </script>
+</body></html>

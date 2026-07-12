@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TransitOps | Driver Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "background": "#141313",
+                    "on-tertiary-container": "#636565",
+                    "surface-container-lowest": "#0e0e0e",
+                    "on-background": "#e5e2e1",
+                    "secondary-fixed-dim": "#c8c6c6",
+                    "on-primary": "#2f3131",
+                    "on-secondary-fixed-variant": "#474747",
+                    "on-surface": "#e5e2e1",
+                    "on-tertiary": "#2f3131",
+                    "surface-container-low": "#1c1b1b",
+                    "inverse-surface": "#e5e2e1",
+                    "on-primary-container": "#636565",
+                    "on-surface-variant": "#c4c7c8",
+                    "on-error": "#690005",
+                    "secondary-container": "#474747",
+                    "secondary-fixed": "#e4e2e1",
+                    "inverse-on-surface": "#313030",
+                    "on-primary-fixed": "#1a1c1c",
+                    "error": "#ffb4ab",
+                    "error-container": "#93000a",
+                    "surface-dim": "#141313",
+                    "surface-container-highest": "#353434",
+                    "secondary": "#c8c6c6",
+                    "surface-variant": "#353434",
+                    "surface-container-high": "#2a2a2a",
+                    "surface-tint": "#c6c6c7",
+                    "primary-container": "#e2e2e2",
+                    "tertiary-container": "#e2e2e2",
+                    "primary-fixed-dim": "#c6c6c7",
+                    "primary": "#ffffff",
+                    "on-primary-fixed-variant": "#454747",
+                    "on-secondary-fixed": "#1b1c1c",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "on-secondary": "#303030",
+                    "surface-container": "#201f1f",
+                    "surface": "#141313",
+                    "on-tertiary-fixed-variant": "#454747",
+                    "tertiary-fixed": "#e2e2e2",
+                    "outline": "#8e9192",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "outline-variant": "#444748",
+                    "surface-bright": "#3a3939",
+                    "on-error-container": "#ffdad6",
+                    "on-secondary-container": "#b6b5b4",
+                    "tertiary": "#ffffff",
+                    "inverse-primary": "#5d5f5f",
+                    "primary-fixed": "#e2e2e2"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0px",
+                    "lg": "0px",
+                    "xl": "0px",
+                    "full": "0px"
+            },
+            "spacing": {
+                    "margin-page": "24px",
+                    "unit": "4px",
+                    "grid-size": "32px",
+                    "container-padding": "12px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "mono-data": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                    "mono-data": ["14px", {"lineHeight": "1", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "headline-sm": ["18px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #101010;
+            color: #e5e2e1;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        /* Grid Texture */
+        .grid-bg {
+            background-image: radial-gradient(circle, #ffffff10 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+        /* Zero-Tolerance Geometry */
+        * {
+            border-radius: 0 !important;
+        }
+        /* Operational Frame */
+        .viewport-frame {
+            position: fixed;
+            inset: 0;
+            border: 1px solid #FFFFFF20;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .data-table-row:hover {
+            background-color: #1a1a1a;
+            border-color: #ffffff;
+        }
+        .compliance-highlight {
+            border-left: 1px solid #ffb4ab;
+        }
+    </style>
+</head>
+<body class="font-body-md bg-background grid-bg selection:bg-primary selection:text-background">
+<div class="viewport-frame"></div>
+<!-- Side Navigation Shell -->
+<aside class="flex flex-col fixed left-0 top-0 h-full z-40 bg-background w-64 border-r border-outline-variant">
+<div class="p-gutter h-16 flex flex-col justify-center border-b border-outline-variant">
+<span class="font-headline-md text-headline-md font-bold tracking-tighter text-primary">TRANSITOPS</span>
+<span class="font-label-caps text-[10px] tracking-[0.2em] text-on-surface-variant">COMMAND CENTER</span>
+</div>
+<nav class="flex-1 py-4 overflow-y-auto">
+<div class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary border border-transparent hover:border-primary transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps uppercase">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary border border-transparent hover:border-primary transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">directions_bus</span>
+<span class="font-label-caps uppercase">Vehicles</span>
+</a>
+<!-- Active Item -->
+<a class="flex items-center gap-3 px-4 py-3 bg-primary text-on-primary border border-primary scale-[0.99] transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person_pin</span>
+<span class="font-label-caps uppercase">Drivers</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary border border-transparent hover:border-primary transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">route</span>
+<span class="font-label-caps uppercase">Trips</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary border border-transparent hover:border-primary transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">build</span>
+<span class="font-label-caps uppercase">Maintenance</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary border border-transparent hover:border-primary transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-caps uppercase">Expenses</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary border border-transparent hover:border-primary transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-caps uppercase">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary border border-transparent hover:border-primary transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-caps uppercase">Documents</span>
+</a>
+</div>
+</nav>
+<div class="p-gutter border-t border-outline-variant">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-surface-container-highest border border-outline-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-body-md">settings</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-[10px]">SYSTEM VER 4.2</span>
+<span class="font-mono-data text-[10px] text-on-surface-variant">SECURE_TUNNEL_ON</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Top Navigation Shell -->
+<header class="fixed top-0 right-0 left-64 flex justify-between items-center px-gutter h-16 z-30 bg-background border-b border-outline-variant">
+<div class="flex items-center gap-gutter">
+<span class="font-headline-sm text-headline-sm font-bold text-primary">DRIVER MANAGEMENT</span>
+<div class="h-4 w-[1px] bg-outline-variant"></div>
+<div class="flex gap-6">
+<a class="font-label-caps text-on-surface-variant hover:text-primary transition-colors" href="#">DRIVER</a>
+<a class="font-label-caps text-primary font-bold border-b border-primary" href="#">DISPATCHER</a>
+<a class="font-label-caps text-on-surface-variant hover:text-primary transition-colors" href="#">ADMIN</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors p-2">notifications</button>
+<div class="h-8 w-[1px] bg-outline-variant mx-2"></div>
+<button class="bg-primary text-on-primary px-4 py-2 font-label-caps uppercase flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                ADD DRIVER
+            </button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-16 min-h-screen">
+<div class="p-margin-page space-y-gutter">
+<!-- Dashboard Top: Compliance Section (Urgent Alerts) -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<div class="bg-surface-container border border-outline-variant p-gutter compliance-highlight relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-2 opacity-20 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-error">warning</span>
+</div>
+<span class="font-label-caps text-on-surface-variant uppercase text-[10px]">Compliance Alert</span>
+<h3 class="font-headline-sm mt-1 text-error">LICENSE EXPIRIES</h3>
+<div class="mt-4 flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg font-bold">04</span>
+<span class="font-label-caps text-on-surface-variant">DRIVERS AT RISK</span>
+</div>
+<div class="mt-4 pt-4 border-t border-outline-variant flex justify-between items-center">
+<span class="font-mono-data text-on-surface-variant text-[11px]">NEXT: MARCUS R. (3D)</span>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">arrow_forward</span>
+</div>
+</div>
+<div class="bg-surface-container border border-outline-variant p-gutter compliance-highlight relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-2 opacity-20 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-error">speed</span>
+</div>
+<span class="font-label-caps text-on-surface-variant uppercase text-[10px]">Performance Alert</span>
+<h3 class="font-headline-sm mt-1 text-error">LOW SAFETY SCORE</h3>
+<div class="mt-4 flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg font-bold">02</span>
+<span class="font-label-caps text-on-surface-variant">BELOW THRESHOLD</span>
+</div>
+<div class="mt-4 pt-4 border-t border-outline-variant flex justify-between items-center">
+<span class="font-mono-data text-on-surface-variant text-[11px]">AVG SCORE: 92/100</span>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">arrow_forward</span>
+</div>
+</div>
+<div class="bg-surface-container border border-outline-variant p-gutter relative overflow-hidden">
+<div class="absolute inset-0 opacity-5 pointer-events-none">
+
+</div>
+<span class="font-label-caps text-on-surface-variant uppercase text-[10px]">Operational Status</span>
+<h3 class="font-headline-sm mt-1">FLEET ACTIVITY</h3>
+<div class="mt-4 flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg font-bold">86%</span>
+<span class="font-label-caps text-on-surface-variant">CAPACITY UTILIZED</span>
+</div>
+<div class="mt-4 pt-4 border-t border-outline-variant flex justify-between items-center">
+<span class="font-mono-data text-on-surface-variant text-[11px]">ACTIVE: 42 / IDLE: 6</span>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">refresh</span>
+</div>
+</div>
+</section>
+<!-- Table Filters -->
+<div class="flex justify-between items-center border-b border-outline-variant pb-4 mt-8">
+<div class="flex gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+<input class="bg-surface-container-low border border-outline-variant pl-10 pr-4 py-2 text-on-surface font-label-caps text-[11px] w-64 focus:border-primary focus:ring-0" placeholder="FILTER BY NAME, ID, OR STATUS..." type="text"/>
+</div>
+<button class="border border-outline-variant px-4 py-2 font-label-caps text-[11px] text-on-surface-variant hover:border-primary hover:text-primary transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">filter_list</span>
+                        ADVANCED FILTERS
+                    </button>
+</div>
+<div class="flex gap-2">
+<button class="p-2 border border-primary bg-surface-container text-primary">
+<span class="material-symbols-outlined text-[20px]">view_list</span>
+</button>
+<button class="p-2 border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary">
+<span class="material-symbols-outlined text-[20px]">grid_view</span>
+</button>
+</div>
+</div>
+<!-- Driver List Table -->
+<div class="overflow-x-auto">
+<table class="w-full border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant text-left">
+<th class="p-4 font-label-caps text-[10px] text-on-surface-variant">DRIVER PROFILE</th>
+<th class="p-4 font-label-caps text-[10px] text-on-surface-variant">OPERATIONAL STATUS</th>
+<th class="p-4 font-label-caps text-[10px] text-on-surface-variant">LICENSE EXPIRY</th>
+<th class="p-4 font-label-caps text-[10px] text-on-surface-variant">SAFETY SCORE</th>
+<th class="p-4 font-label-caps text-[10px] text-on-surface-variant">FLEET ID</th>
+<th class="p-4 font-label-caps text-[10px] text-on-surface-variant text-right">ACTIONS</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<!-- Driver 1 -->
+<tr class="data-table-row border-b border-outline-variant/30 transition-all duration-75 group cursor-pointer">
+<td class="p-4">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 border border-outline-variant bg-surface-container-highest flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A clinical, close-up studio portrait of a professional transit driver in a sharp grey uniform. The lighting is cold and cinematic, highlighting strong features. The background is a minimalist dark technical space with subtle grid lines. High-contrast monochromatic style, authoritative and surgical." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8A3X2Ss4QSX36cWJ5HjaZkuj-whDj7yHkahYyv6eSL36qV-1-zf9ej7uxIoUWLNwmQDlHeosk5AFm8iX5RAgTtaRUVB9EFOQw97r7T7X4b3j4AoPPFH5QM8S5XmTylvyL8oo3B1KnxOdXzBY2364mHWxVAQMe1_mYLJ8JGABHxEzmWskMvoWdD1VjG8Yrkt9rLyoCc_WQ-y8ux3TzX8cqFMqaqdpC8sJIOVypz2GkOr4WdyUoYxdIGA"/>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-sm font-bold">ALEXANDER VAUGHN</span>
+<span class="font-mono-data text-[10px] text-on-surface-variant uppercase">Senior Operator</span>
+</div>
+</div>
+</td>
+<td class="p-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 bg-emerald-500"></span>
+<span class="font-label-caps text-[11px] text-on-surface">ACTIVE</span>
+</div>
+</td>
+<td class="p-4">
+<span class="font-mono-data text-on-surface">2025-08-14</span>
+</td>
+<td class="p-4">
+<div class="flex items-center gap-3">
+<div class="flex-1 h-1 bg-surface-container-highest w-24">
+<div class="h-full bg-primary" style="width: 98%"></div>
+</div>
+<span class="font-mono-data text-primary">98</span>
+</div>
+</td>
+<td class="p-4">
+<span class="font-mono-data text-on-surface-variant">TX-8821</span>
+</td>
+<td class="p-4 text-right">
+<button class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">more_vert</button>
+</td>
+</tr>
+<!-- Driver 2: Warning State -->
+<tr class="data-table-row border-b border-outline-variant/30 transition-all duration-75 group cursor-pointer">
+<td class="p-4">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 border border-error bg-surface-container-highest flex-shrink-0">
+<img class="w-full h-full object-cover grayscale" data-alt="A profile photo of a transit driver with a serious expression, shot in a high-tech control room environment. Cold, blue-ish lighting accents the edges of his face. The style is hyper-modern and industrial, emphasizing technical precision and a high-stakes professional atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuATGQiSKuQcfrBKl5-pmxmFIjE2L2U-FxsfMcmgfxx5ZYF7gEA-rbvo6HfXtBhh1ySsmPH5sAV3bJdQZNDtOYPn5sQjEclXFR5r93gVB0A-FOWrMAtiJDAXG5osnRqF4ibP9px0In5OXCfI5CNRftdY_4sfCHie6YnSPrkdzmuD0uV9APKWaWx-6hZ6kgVGEulqIhVWiaWimJ0MZ0X62_qNYJYazyKG8-gWNCpDhOczvTPTKYOkN7lFbA"/>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-sm font-bold">MARCUS REED</span>
+<span class="font-mono-data text-[10px] text-error uppercase">Action Required</span>
+</div>
+</div>
+</td>
+<td class="p-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 bg-amber-500"></span>
+<span class="font-label-caps text-[11px] text-on-surface">OFF DUTY</span>
+</div>
+</td>
+<td class="p-4">
+<span class="font-mono-data text-error font-bold">2024-05-20</span>
+</td>
+<td class="p-4">
+<div class="flex items-center gap-3">
+<div class="flex-1 h-1 bg-surface-container-highest w-24">
+<div class="h-full bg-on-tertiary-container" style="width: 91%"></div>
+</div>
+<span class="font-mono-data text-on-surface">91</span>
+</div>
+</td>
+<td class="p-4">
+<span class="font-mono-data text-on-surface-variant">TX-4029</span>
+</td>
+<td class="p-4 text-right">
+<button class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">more_vert</button>
+</td>
+</tr>
+<!-- Driver 3 -->
+<tr class="data-table-row border-b border-outline-variant/30 transition-all duration-75 group cursor-pointer">
+<td class="p-4">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 border border-outline-variant bg-surface-container-highest flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A portrait of a female driver wearing technical transit apparel, her gaze directed towards the camera with professional focus. The background shows blurred holographic interfaces. Monochrome aesthetic with sharp white highlights and deep black shadows. Futuristic industrial design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAsixFRBdz4u2eDxsiJ-ejWU5KSOiJMCwP-pZLdCMaGacKRbYPCWAAMljkB7wLrET7b0hg9YNQwiXUfdWzTdt9iWcx1Wp1T4Ot6cyzbkuVELoaipzXrrOiH4grfjNDwhDtK2TG91j4ZhnFRNT-ey9immfnQKwOIA5cR3I-ihgfIHdHvuNwIose5PRYDpi5zSDYwlqSX5nchA_MNfnneX3AY9KvMIpVD1KbktXXfL-xw8FLt1ObakyzDA"/>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-sm font-bold">SARAH CHEN</span>
+<span class="font-mono-data text-[10px] text-on-surface-variant uppercase">Logistics Specialist</span>
+</div>
+</div>
+</td>
+<td class="p-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 bg-emerald-500"></span>
+<span class="font-label-caps text-[11px] text-on-surface">ACTIVE</span>
+</div>
+</td>
+<td class="p-4">
+<span class="font-mono-data text-on-surface">2026-11-02</span>
+</td>
+<td class="p-4">
+<div class="flex items-center gap-3">
+<div class="flex-1 h-1 bg-surface-container-highest w-24">
+<div class="h-full bg-primary" style="width: 95%"></div>
+</div>
+<span class="font-mono-data text-primary">95</span>
+</div>
+</td>
+<td class="p-4">
+<span class="font-mono-data text-on-surface-variant">TX-9104</span>
+</td>
+<td class="p-4 text-right">
+<button class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">more_vert</button>
+</td>
+</tr>
+<!-- Driver 4: Low Safety Score -->
+<tr class="data-table-row border-b border-outline-variant/30 transition-all duration-75 group cursor-pointer">
+<td class="p-4">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 border border-outline-variant bg-surface-container-highest flex-shrink-0">
+<img class="w-full h-full object-cover grayscale" data-alt="Close up of a driver looking slightly away from the camera, wearing a headset. High contrast, sharp detail, cold steel color palette. Background is a dark minimalist architectural space. Zero organic shapes, strictly rectilinear lines. Authoritative and surgical mood." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAS6MxzWyGYMLv1mIwx1RwsZLYyFguFzgZskQlmk7nMWns7D6pK6P6v-XwuozAmmIvQSuvwzVa_sGJk4zb93wAdNLJmHsy_ZZNxAivu9ofbutPOmyqG9rG8Fz-lvZf0kHXKbbQ0SEe4_-UylmXy2XhbNBBgkICH6TKeB7TBCorNMU1RUkn9cpnqZpobWA9ECoW9FqG3na4aJgFZ4bVCJuU89pNap3lVVOQItiMQnBR2WEG2xYi8r_gz-w"/>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-sm font-bold">JULIAN KOST</span>
+<span class="font-mono-data text-[10px] text-on-surface-variant uppercase">Operator II</span>
+</div>
+</div>
+</td>
+<td class="p-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 bg-rose-600"></span>
+<span class="font-label-caps text-[11px] text-on-surface">SUSPENDED</span>
+</div>
+</td>
+<td class="p-4">
+<span class="font-mono-data text-on-surface">2025-01-12</span>
+</td>
+<td class="p-4">
+<div class="flex items-center gap-3">
+<div class="flex-1 h-1 bg-surface-container-highest w-24">
+<div class="h-full bg-error" style="width: 68%"></div>
+</div>
+<span class="font-mono-data text-error font-bold">68</span>
+</div>
+</td>
+<td class="p-4">
+<span class="font-mono-data text-on-surface-variant">TX-2210</span>
+</td>
+<td class="p-4 text-right">
+<button class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">more_vert</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination/Footer Stats -->
+<div class="flex justify-between items-center pt-8">
+<span class="font-mono-data text-[11px] text-on-surface-variant">SHOWING 4 OF 48 OPERATORS</span>
+<div class="flex gap-[1px] bg-outline-variant">
+<button class="bg-surface-container px-4 py-2 text-on-surface-variant hover:text-primary transition-colors border border-outline-variant">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="bg-primary px-4 py-2 text-on-primary font-mono-data text-[12px] border border-primary">01</button>
+<button class="bg-surface-container px-4 py-2 text-on-surface-variant hover:text-primary font-mono-data text-[12px] border border-outline-variant">02</button>
+<button class="bg-surface-container px-4 py-2 text-on-surface-variant hover:text-primary font-mono-data text-[12px] border border-outline-variant">03</button>
+<button class="bg-surface-container px-4 py-2 text-on-surface-variant hover:text-primary transition-colors border border-outline-variant">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Micro-interactions
+        document.querySelectorAll('.data-table-row').forEach(row => {
+            row.addEventListener('click', () => {
+                console.log('Accessing driver record...');
+                // Visual feedback
+                row.style.transform = 'scale(0.995)';
+                setTimeout(() => row.style.transform = 'scale(1)', 100);
+            });
+        });
+
+        // Atmospheric effect: Pulse compliance alerts
+        setInterval(() => {
+            document.querySelectorAll('.compliance-highlight').forEach(el => {
+                el.style.borderColor = el.style.borderColor === 'rgb(255, 180, 171)' ? '#333' : '#ffb4ab';
+            });
+        }, 1500);
+    </script>
+</body></html>
