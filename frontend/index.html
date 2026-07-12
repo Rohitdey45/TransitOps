@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TransitOps API Tester</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background: #111827;
+            color: white;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .card {
+            background: #1F2937;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 18px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background: #6366F1;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: .9;
+        }
+
+        pre {
+            background: #000;
+            color: #00ff88;
+            padding: 15px;
+            overflow: auto;
+            border-radius: 8px;
+            max-height: 400px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>TransitOps Backend Tester</h1>
+
+        <div class="card">
+
+            <h2>Login</h2>
+
+            <input id="email" placeholder="Email">
+            <input id="password" type="password" placeholder="Password">
+
+            <button onclick="login()">Login</button>
+
+        </div>
+
+        <div class="card">
+
+            <h2>Backend</h2>
+
+            <button onclick="health()">Health</button>
+            <button onclick="getVehicles()">Vehicles</button>
+            <button onclick="getDrivers()">Drivers</button>
+            <button onclick="getTrips()">Trips</button>
+
+        </div>
+
+        <div class="card">
+
+            <h2>Add Vehicle</h2>
+
+            <input id="reg" placeholder="Registration Number">
+            <input id="name" placeholder="Vehicle Name">
+            <input id="type" placeholder="Type">
+            <input id="capacity" placeholder="Max Capacity">
+            <input id="odo" placeholder="Odometer">
+            <input id="cost" placeholder="Acquisition Cost">
+
+            <button onclick="addVehicle()">Create Vehicle</button>
+
+        </div>
+
+        <div class="card">
+
+            <h2>Response</h2>
+
+            <pre id="output">Waiting...</pre>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        const BASE_URL = "http://localhost:4000"; // Change if needed
+
+        function show(data) {
+            document.getElementById("output").textContent =
+                JSON.stringify(data, null, 2);
+        }
+
+        function token() {
+            return localStorage.getItem("token");
+        }
+
+        async function login() {
+
+            const res = await fetch(BASE_URL + "/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: document.getElementById("email").value,
+                    password: document.getElementById("password").value
+                })
+            });
+
+            const data = await res.json();
+
+            if (data.token) {
+                localStorage.setItem("token", data.token);
+            }
+
+            show(data);
+        }
+
+        async function health() {
+
+            const res = await fetch(BASE_URL + "/health");
+
+            show(await res.json());
+
+        }
+
+        async function getVehicles() {
+
+            const res = await fetch(BASE_URL + "/vehicles", {
+
+                headers: {
+                    Authorization: "Bearer " + token()
+                }
+
+            });
+
+            show(await res.json());
+
+        }
+
+        async function getDrivers() {
+
+            const res = await fetch(BASE_URL + "/drivers", {
+
+                headers: {
+                    Authorization: "Bearer " + token()
+                }
+
+            });
+
+            show(await res.json());
+
+        }
+
+        async function getTrips() {
+
+            const res = await fetch(BASE_URL + "/trips", {
+
+                headers: {
+                    Authorization: "Bearer " + token()
+                }
+
+            });
+
+            show(await res.json());
+
+        }
+
+        async function addVehicle() {
+
+            const body = {
+
+                registrationNumber: document.getElementById("reg").value,
+                name: document.getElementById("name").value,
+                type: document.getElementById("type").value,
+                maxLoadCapacity: Number(document.getElementById("capacity").value),
+                odometer: Number(document.getElementById("odo").value),
+                acquisitionCost: Number(document.getElementById("cost").value)
+
+            };
+
+            const res = await fetch(BASE_URL + "/vehicles", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + token()
+                },
+
+                body: JSON.stringify(body)
+
+            });
+
+            show(await res.json());
+
+        }
+
+    </script>
+
+</body>
+
+</html>
