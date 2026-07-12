@@ -5,10 +5,10 @@ const prisma = new PrismaClient();
 
 async function main() {
   const users = [
-    { email: 'dev@transitops.com', password: 'password123', name: 'Fleet Manager', role: 'FLEET_MANAGER' },
-    { email: 'mark@transitops.com', password: 'password123', name: 'Alex Driver', role: 'DRIVER' },
-    { email: 'ben@transitops.com', password: 'password123', name: 'Safety Officer', role: 'SAFETY_OFFICER' },
-    { email: 'tom@transitops.com', password: 'password123', name: 'Finance Analyst', role: 'FINANCIAL_ANALYST' },
+    { email: 'manager@transitops.com', password: 'password123', name: 'Fleet Manager', role: 'FLEET_MANAGER' },
+    { email: 'driver@transitops.com', password: 'password123', name: 'Alex Driver', role: 'DRIVER' },
+    { email: 'safety@transitops.com', password: 'password123', name: 'Safety Officer', role: 'SAFETY_OFFICER' },
+    { email: 'finance@transitops.com', password: 'password123', name: 'Finance Analyst', role: 'FINANCIAL_ANALYST' },
   ];
 
   for (const u of users) {
