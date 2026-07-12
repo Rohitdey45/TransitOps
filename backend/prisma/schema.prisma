@@ -21,3 +21,43 @@ enum Role {
   SAFETY_OFFICER
   FINANCIAL_ANALYST
 }
+
+model Vehicle {
+  id              String   @id @default(uuid())
+  regNumber       String   @unique
+  name            String
+  type            String
+  maxLoadCapacity Float
+  odometer        Float    @default(0)
+  acquisitionCost Float
+  status          VehicleStatus @default(AVAILABLE)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+enum VehicleStatus {
+  AVAILABLE
+  ON_TRIP
+  IN_SHOP
+  RETIRED
+}
+
+model Driver {
+  id              String   @id @default(uuid())
+  name            String
+  licenseNumber   String   @unique
+  licenseCategory String
+  licenseExpiry   DateTime
+  contactNumber   String
+  safetyScore     Int      @default(100)
+  status          DriverStatus @default(AVAILABLE)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+enum DriverStatus {
+  AVAILABLE
+  ON_TRIP
+  OFF_DUTY
+  SUSPENDED
+}
