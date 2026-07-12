@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { Bell, LogOut } from 'lucide-react'
+import { Bell, LogOut, Sun, Moon } from 'lucide-react'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useTheme } from '../context/ThemeContext.jsx'
 import { useNavigate } from 'react-router-dom'
 
 export default function Topbar({ title, subtitle, actions }) {
   const { logout } = useAuth()
+  const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
   const [time, setTime] = useState(new Date())
 
@@ -31,6 +33,13 @@ export default function Topbar({ title, subtitle, actions }) {
           <span className="hidden md:block font-mono text-[12px] text-faint tabular-nums mr-1">
             {time.toLocaleTimeString('en-US', { hour12: false })}
           </span>
+          <button
+            onClick={toggleTheme}
+            className="w-9 h-9 rounded-md border border-line flex items-center justify-center text-dim hover:text-ink hover:border-line2 transition-colors"
+            title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
+          </button>
           <button className="w-9 h-9 rounded-md border border-line flex items-center justify-center text-dim hover:text-ink hover:border-line2 transition-colors">
             <Bell size={15} />
           </button>
@@ -46,3 +55,4 @@ export default function Topbar({ title, subtitle, actions }) {
     </header>
   )
 }
+

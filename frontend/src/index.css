@@ -1,3 +1,37 @@
+:root {
+  --color-bg: #0a0b0d;
+  --color-panel: #111316;
+  --color-panel-2: #16181c;
+  --color-panel-3: #1c1f24;
+  --color-line: #25282e;
+  --color-line-2: #2f333a;
+  --color-ink: #f4f5f6;
+  --color-dim: #8b909a;
+  --color-faint: #5a5f68;
+  --color-ok: #34d399;
+  --color-warn: #f5a623;
+  --color-err: #f8607a;
+  --color-info: #4fb0ff;
+  --bg-grid: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.035) 1px, transparent 0);
+}
+
+:root.light {
+  --color-bg: #f8fafc;
+  --color-panel: #ffffff;
+  --color-panel-2: #f1f5f9;
+  --color-panel-3: #e2e8f0;
+  --color-line: #e2e8f0;
+  --color-line-2: #cbd5e1;
+  --color-ink: #0f172a;
+  --color-dim: #475569;
+  --color-faint: #64748b;
+  --color-ok: #10b981;
+  --color-warn: #f59e0b;
+  --color-err: #ef4444;
+  --color-info: #3b82f6;
+  --bg-grid: radial-gradient(circle at 1px 1px, rgba(0,0,0,0.035) 1px, transparent 0);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -7,10 +41,11 @@ html, body, #root {
 }
 
 body {
-  background-color: #0a0b0d;
-  background-image:
-    radial-gradient(circle at 1px 1px, rgba(255,255,255,0.035) 1px, transparent 0);
+  background-color: var(--color-bg);
+  background-image: var(--bg-grid);
   background-size: 28px 28px;
+  color: var(--color-ink);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 ::-webkit-scrollbar {
@@ -21,16 +56,16 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #25282e;
+  background: var(--color-line);
   border-radius: 8px;
-  border: 2px solid #0a0b0d;
+  border: 2px solid var(--color-bg);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #2f333a;
+  background: var(--color-line-2);
 }
 
 :focus-visible {
-  outline: 2px solid #f4f5f6;
+  outline: 2px solid var(--color-ink);
   outline-offset: 2px;
 }
 

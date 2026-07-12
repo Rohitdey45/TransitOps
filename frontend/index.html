@@ -10,25 +10,38 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
+  <script>
+    // Prevent flash of theme on load
+    (function() {
+      try {
+        const theme = localStorage.getItem('theme') || 'dark';
+        if (theme === 'light') {
+          document.documentElement.classList.add('light');
+        } else {
+          document.documentElement.classList.remove('light');
+        }
+      } catch (e) {}
+    })();
+  </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            bg: '#0a0b0d',
-            panel: '#111316',
-            panel2: '#16181c',
-            panel3: '#1c1f24',
-            line: '#25282e',
-            line2: '#2f333a',
-            ink: '#f4f5f6',
-            dim: '#8b909a',
-            faint: '#5a5f68',
-            ok: '#34d399',
-            warn: '#f5a623',
-            err: '#f8607a',
-            info: '#4fb0ff',
+            bg: 'var(--color-bg)',
+            panel: 'var(--color-panel)',
+            panel2: 'var(--color-panel-2)',
+            panel3: 'var(--color-panel-3)',
+            line: 'var(--color-line)',
+            line2: 'var(--color-line-2)',
+            ink: 'var(--color-ink)',
+            dim: 'var(--color-dim)',
+            faint: 'var(--color-faint)',
+            ok: 'var(--color-ok)',
+            warn: 'var(--color-warn)',
+            err: 'var(--color-err)',
+            info: 'var(--color-info)',
           },
           fontFamily: {
             display: ['"Space Grotesk"', 'sans-serif'],

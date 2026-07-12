@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Route, Truck, Users, Wrench, BarChart3, ArrowRight } from 'lucide-react'
+import { Route, Truck, Users, Wrench, BarChart3, ArrowRight, Sun, Moon } from 'lucide-react'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useTheme } from '../context/ThemeContext.jsx'
 import { useToast } from '../context/ToastContext.jsx'
 
 const FEATURES = [
@@ -17,6 +18,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const { login } = useAuth()
+  const { theme, toggleTheme } = useTheme()
   const toast = useToast()
   const navigate = useNavigate()
   const location = useLocation()
@@ -37,7 +39,17 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex bg-bg">
+    <div className="min-h-screen flex bg-bg relative">
+      <div className="absolute top-4 right-4 z-10">
+        <button
+          onClick={toggleTheme}
+          className="w-9 h-9 rounded-md border border-line bg-panel2 flex items-center justify-center text-dim hover:text-ink hover:border-line2 transition-colors"
+          title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        >
+          {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
+        </button>
+      </div>
+
       {/* Left — brand panel */}
       <div className="hidden lg:flex w-[46%] flex-col justify-between border-r border-line px-14 py-12 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-panel/40 to-transparent pointer-events-none" />

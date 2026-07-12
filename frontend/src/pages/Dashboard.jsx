@@ -10,7 +10,7 @@ import { useAuth } from '../context/AuthContext.jsx'
 import api from '../api/client.js'
 import { daysUntil, formatDate } from '../utils/format.js'
 
-const STATUS_COLORS = { AVAILABLE: '#34d399', ON_TRIP: '#4fb0ff', IN_SHOP: '#f5a623', RETIRED: '#5a5f68' }
+const STATUS_COLORS = { AVAILABLE: 'var(--color-ok)', ON_TRIP: 'var(--color-info)', IN_SHOP: 'var(--color-warn)', RETIRED: 'var(--color-faint)' }
 
 export default function Dashboard() {
   const { user, can } = useAuth()
@@ -136,10 +136,10 @@ export default function Dashboard() {
                     <PieChart>
                       <Pie data={pieData} dataKey="value" nameKey="name" innerRadius={45} outerRadius={70} paddingAngle={3}>
                         {pieData.map((d, i) => (
-                          <Cell key={i} fill={STATUS_COLORS[d.name] || '#5a5f68'} stroke="none" />
+                          <Cell key={i} fill={STATUS_COLORS[d.name] || 'var(--color-faint)'} stroke="none" />
                         ))}
                       </Pie>
-                      <Tooltip contentStyle={{ background: '#16181c', border: '1px solid #25282e', borderRadius: 8, fontSize: 12 }} />
+                      <Tooltip contentStyle={{ background: 'var(--color-panel-2)', border: '1px solid var(--color-line)', color: 'var(--color-ink)', borderRadius: 8, fontSize: 12 }} />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
