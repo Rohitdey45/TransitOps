@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TransitOps — API Test Console</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #12181f;
+    --panel-2: #161d26;
+    --border: #232b34;
+    --text: #dbe2ea;
+    --text-dim: #7c8a9a;
+    --accent: #4fb0ff;
+    --accent-dim: #1d3a52;
+    --ok: #3ecf8e;
+    --err: #ff6b6b;
+    --warn: #f5a623;
+    --mono: "SF Mono", "JetBrains Mono", Consolas, monospace;
+    --sans: -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* Sidebar */
+  #sidebar {
+    width: 230px;
+    flex-shrink: 0;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    padding: 16px 0;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  #sidebar .brand {
+    font-weight: 700;
+    font-size: 15px;
+    padding: 0 16px 14px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 10px;
+    letter-spacing: 0.3px;
+  }
+  #sidebar .brand span { color: var(--accent); }
+  .nav-group-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    padding: 12px 16px 4px;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 16px;
+    cursor: pointer;
+    color: var(--text-dim);
+    border-left: 2px solid transparent;
+  }
+  .nav-item:hover { color: var(--text); background: var(--panel-2); }
+  .nav-item.active {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    background: var(--panel-2);
+  }
+  .nav-item .method {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    width: 38px;
+    flex-shrink: 0;
+  }
+  .m-get { color: var(--ok); }
+  .m-post { color: var(--warn); }
+  .m-patch { color: var(--accent); }
+  .m-delete { color: var(--err); }
+
+  /* Main */
+  #main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  #topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+    flex-wrap: wrap;
+  }
+  #topbar input {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+  #baseUrlInput { width: 220px; }
+  #sessionInfo {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+  }
+  #sessionBadge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+  #sessionBadge.logged-in { color: var(--ok); border-color: var(--ok); }
+  #logoutBtn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+  }
+  #logoutBtn:hover { color: var(--err); border-color: var(--err); }
+
+  #content {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+    max-width: 900px;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .panel h2 {
+    margin: 0 0 4px;
+    font-size: 19px;
+  }
+  .panel .endpoint-desc {
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    font-size: 13px;
+  }
+  .endpoint-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+  }
+  .access-tag {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    margin-left: 8px;
+  }
+
+  form.card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 18px;
+  }
+  .field-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 160px;
+  }
+  .field label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .field input, .field select, .field textarea {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+  }
+  .field textarea { resize: vertical; min-height: 60px; }
+  .field input:focus, .field select:focus, .field textarea:focus,
+  #topbar input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  button.run {
+    background: var(--accent);
+    color: #04121e;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  button.run:hover { filter: brightness(1.1); }
+  button.run:disabled { opacity: 0.5; cursor: default; }
+  button.run.danger { background: var(--err); color: #200; }
+  button.secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 9px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    margin-left: 8px;
+  }
+  button.secondary:hover { color: var(--text); border-color: var(--text-dim); }
+
+  .response-box {
+    background: #090c10;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    font-family: var(--mono);
+    font-size: 12px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 380px;
+    overflow-y: auto;
+    margin-top: 4px;
+  }
+  .status-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+  .status-pill {
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 700;
+  }
+  .status-2xx { background: rgba(62,207,142,0.15); color: var(--ok); }
+  .status-4xx { background: rgba(255,107,107,0.15); color: var(--err); }
+  .status-pending { background: rgba(245,166,35,0.15); color: var(--warn); }
+
+  .quick-users {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .quick-users button {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 11.5px;
+    font-family: var(--mono);
+  }
+  .quick-users button:hover { color: var(--accent); border-color: var(--accent); }
+
+  .hint {
+    font-size: 11.5px;
+    color: var(--text-dim);
+    margin-top: 6px;
+  }
+  .checklist-note {
+    background: var(--accent-dim);
+    border: 1px solid var(--accent);
+    color: var(--text);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    margin-bottom: 16px;
+  }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <div class="brand">Transit<span>Ops</span> API Console</div>
+
+  <div class="nav-group-label">Auth</div>
+  <div class="nav-item active" data-panel="login"><span class="method m-post">POST</span> Login</div>
+  <div class="nav-item" data-panel="me"><span class="method m-get">GET</span> Current User</div>
+
+  <div class="nav-group-label">Vehicles</div>
+  <div class="nav-item" data-panel="vehiclesList"><span class="method m-get">GET</span> List Vehicles</div>
+  <div class="nav-item" data-panel="vehicleCreate"><span class="method m-post">POST</span> Register Vehicle</div>
+  <div class="nav-item" data-panel="vehicleUpdate"><span class="method m-patch">PATCH</span> Update Vehicle</div>
+  <div class="nav-item" data-panel="vehicleDelete"><span class="method m-delete">DEL</span> Delete Vehicle</div>
+  <div class="nav-item" data-panel="vehicleCost"><span class="method m-get">GET</span> Operational Cost</div>
+
+  <div class="nav-group-label">Drivers</div>
+  <div class="nav-item" data-panel="driversList"><span class="method m-get">GET</span> List Drivers</div>
+  <div class="nav-item" data-panel="driverCreate"><span class="method m-post">POST</span> Register Driver</div>
+  <div class="nav-item" data-panel="driverUpdate"><span class="method m-patch">PATCH</span> Update Driver</div>
+  <div class="nav-item" data-panel="driverDelete"><span class="method m-delete">DEL</span> Delete Driver</div>
+
+  <div class="nav-group-label">Trips</div>
+  <div class="nav-item" data-panel="tripsList"><span class="method m-get">GET</span> List Trips</div>
+  <div class="nav-item" data-panel="tripCreate"><span class="method m-post">POST</span> Create Trip</div>
+  <div class="nav-item" data-panel="tripDispatch"><span class="method m-patch">PATCH</span> Dispatch Trip</div>
+  <div class="nav-item" data-panel="tripReassign"><span class="method m-patch">PATCH</span> Reassign Trip</div>
+  <div class="nav-item" data-panel="tripComplete"><span class="method m-patch">PATCH</span> Complete Trip</div>
+  <div class="nav-item" data-panel="tripCancel"><span class="method m-patch">PATCH</span> Cancel Trip</div>
+
+  <div class="nav-group-label">Maintenance</div>
+  <div class="nav-item" data-panel="maintList"><span class="method m-get">GET</span> List Records</div>
+  <div class="nav-item" data-panel="maintCreate"><span class="method m-post">POST</span> Create Record</div>
+  <div class="nav-item" data-panel="maintClose"><span class="method m-patch">PATCH</span> Close Record</div>
+
+  <div class="nav-group-label">Fuel & Expenses</div>
+  <div class="nav-item" data-panel="fuelList"><span class="method m-get">GET</span> List Fuel Logs</div>
+  <div class="nav-item" data-panel="fuelCreate"><span class="method m-post">POST</span> Log Fuel</div>
+  <div class="nav-item" data-panel="expenseList"><span class="method m-get">GET</span> List Expenses</div>
+  <div class="nav-item" data-panel="expenseCreate"><span class="method m-post">POST</span> Log Expense</div>
+
+  <div class="nav-group-label">Dashboard & Reports</div>
+  <div class="nav-item" data-panel="kpis"><span class="method m-get">GET</span> Dashboard KPIs</div>
+  <div class="nav-item" data-panel="statusBreakdown"><span class="method m-get">GET</span> Status Breakdown</div>
+  <div class="nav-item" data-panel="fleetUtil"><span class="method m-get">GET</span> Fleet Utilization</div>
+  <div class="nav-item" data-panel="vehicleReport"><span class="method m-get">GET</span> Vehicle Report</div>
+
+  <div class="nav-group-label">Exports</div>
+  <div class="nav-item" data-panel="exportCsv"><span class="method m-get">GET</span> Export CSV</div>
+  <div class="nav-item" data-panel="exportPdf"><span class="method m-get">GET</span> Export Fleet PDF</div>
+  <div class="nav-item" data-panel="exportVehiclePdf"><span class="method m-get">GET</span> Export Vehicle PDF</div>
+</div>
+
+<div id="main">
+  <div id="topbar">
+    <label style="font-size:12px;color:var(--text-dim);">Base URL</label>
+    <input id="baseUrlInput" value="http://localhost:4000" />
+    <div id="sessionInfo">
+      <span id="sessionBadge">Not logged in</span>
+      <button id="logoutBtn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div id="content">
+
+    <!-- ===================== AUTH ===================== -->
+    <div class="panel active" id="panel-login">
+      <h2>Login</h2>
+      <div class="endpoint-desc">Authenticate and receive a JWT. The token is stored automatically and reused on every request below.</div>
+      <div class="endpoint-tag">POST /auth/login <span class="access-tag">Public</span></div>
+
+      <div class="quick-users">
+        <button onclick="fillLogin('manager@transitops.com')">Fleet Manager</button>
+        <button onclick="fillLogin('driver@transitops.com')">Driver</button>
+        <button onclick="fillLogin('safety@transitops.com')">Safety Officer</button>
+        <button onclick="fillLogin('finance@transitops.com')">Financial Analyst</button>
+      </div>
+
+      <form class="card" onsubmit="return doLogin(event)">
+        <div class="field-row">
+          <div class="field">
+            <label>Email</label>
+            <input id="loginEmail" value="manager@transitops.com" />
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <input id="loginPassword" value="password123" />
+          </div>
+        </div>
+        <button class="run" type="submit">Login</button>
+      </form>
+      <div id="resp-login"></div>
+    </div>
+
+    <div class="panel" id="panel-me">
+      <h2>Current User</h2>
+      <div class="endpoint-desc">Verifies the stored token and returns the decoded payload.</div>
+      <div class="endpoint-tag">GET /auth/me <span class="access-tag">Authenticated</span></div>
+      <form class="card" onsubmit="return runRequest(event, 'GET', '/auth/me', null, 'me')">
+        <button class="run" type="submit">Send Request</button>
+      </form>
+      <div id="resp-me"></div>
+    </div>
+
+    <!-- ===================== VEHICLES ===================== -->
+    <div class="panel" id="panel-vehiclesList">
+      <h2>List Vehicles</h2>
+      <div class="endpoint-tag">GET /vehicles <span class="access-tag">All roles</span></div>
+      <form class="card" onsubmit="return runVehiclesList(event)">
+        <div class="field-row">
+          <div class="field"><label>Status filter</label>
+            <select id="vlStatus"><option value="">Any</option><option>AVAILABLE</option><option>ON_TRIP</option><option>IN_SHOP</option><option>RETIRED</option></select>
+          </div>
+          <div class="field"><label>Type filter</label><input id="vlType" placeholder="e.g. Semi" /></div>
+        </div>
+        <button class="run" type="submit">List Vehicles</button>
+      </form>
+      <div id="resp-vehiclesList"></div>
+    </div>
+
+    <div class="panel" id="panel-vehicleCreate">
+      <h2>Register Vehicle</h2>
+      <div class="endpoint-tag">POST /vehicles <span class="access-tag">Fleet Manager</span></div>
+      <form class="card" onsubmit="return runVehicleCreate(event)">
+        <div class="field-row">
+          <div class="field"><label>Reg Number</label><input id="vcReg" value="XYZ-1234" /></div>
+          <div class="field"><label>Name/Model</label><input id="vcName" value="Heavy Truck A" /></div>
+          <div class="field"><label>Type</label><input id="vcType" value="Semi" /></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Max Load Capacity</label><input id="vcLoad" value="15000" /></div>
+          <div class="field"><label>Odometer</label><input id="vcOdo" value="0" /></div>
+          <div class="field"><label>Acquisition Cost</label><input id="vcCost" value="80000" /></div>
+        </div>
+        <button class="run" type="submit">Register Vehicle</button>
+      </form>
+      <div id="resp-vehicleCreate"></div>
+    </div>
+
+    <div class="panel" id="panel-vehicleUpdate">
+      <h2>Update Vehicle</h2>
+      <div class="endpoint-tag">PATCH /vehicles/:id <span class="access-tag">Fleet Manager</span></div>
+      <form class="card" onsubmit="return runVehicleUpdate(event)">
+        <div class="field-row">
+          <div class="field"><label>Vehicle ID</label><input id="vuId" placeholder="vehicle uuid" /></div>
+          <div class="field"><label>Status</label>
+            <select id="vuStatus"><option value="">(unchanged)</option><option>AVAILABLE</option><option>ON_TRIP</option><option>IN_SHOP</option><option>RETIRED</option></select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Name</label><input id="vuName" /></div>
+          <div class="field"><label>Odometer</label><input id="vuOdo" /></div>
+          <div class="field"><label>Acquisition Cost</label><input id="vuCost" /></div>
+        </div>
+        <button class="run" type="submit">Update Vehicle</button>
+      </form>
+      <div id="resp-vehicleUpdate"></div>
+    </div>
+
+    <div class="panel" id="panel-vehicleDelete">
+      <h2>Delete Vehicle</h2>
+      <div class="endpoint-tag">DELETE /vehicles/:id <span class="access-tag">Fleet Manager</span></div>
+      <form class="card" onsubmit="return runVehicleDelete(event)">
+        <div class="field"><label>Vehicle ID</label><input id="vdId" placeholder="vehicle uuid" /></div>
+        <button class="run danger" type="submit" style="margin-top:10px;">Delete Vehicle</button>
+      </form>
+      <div id="resp-vehicleDelete"></div>
+    </div>
+
+    <div class="panel" id="panel-vehicleCost">
+      <h2>Vehicle Operational Cost</h2>
+      <div class="endpoint-tag">GET /vehicles/:id/operational-cost <span class="access-tag">All roles</span></div>
+      <form class="card" onsubmit="return runVehicleCost(event)">
+        <div class="field"><label>Vehicle ID</label><input id="vocId" placeholder="vehicle uuid" /></div>
+        <button class="run" type="submit" style="margin-top:10px;">Get Cost</button>
+      </form>
+      <div id="resp-vehicleCost"></div>
+    </div>
+
+    <!-- ===================== DRIVERS ===================== -->
+    <div class="panel" id="panel-driversList">
+      <h2>List Drivers</h2>
+      <div class="endpoint-tag">GET /drivers <span class="access-tag">All roles</span></div>
+      <form class="card" onsubmit="return runDriversList(event)">
+        <div class="field"><label>Status filter</label>
+          <select id="dlStatus"><option value="">Any</option><option>AVAILABLE</option><option>ON_TRIP</option><option>OFF_DUTY</option><option>SUSPENDED</option></select>
+        </div>
+        <button class="run" type="submit" style="margin-top:10px;">List Drivers</button>
+      </form>
+      <div id="resp-driversList"></div>
+    </div>
+
+    <div class="panel" id="panel-driverCreate">
+      <h2>Register Driver</h2>
+      <div class="endpoint-tag">POST /drivers <span class="access-tag">Fleet Manager</span></div>
+      <form class="card" onsubmit="return runDriverCreate(event)">
+        <div class="field-row">
+          <div class="field"><label>Name</label><input id="dcName" value="John Doe" /></div>
+          <div class="field"><label>License Number</label><input id="dcLic" value="LIC-98765" /></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>License Category</label><input id="dcCat" value="Class A" /></div>
+          <div class="field"><label>License Expiry</label><input id="dcExp" value="2030-12-31" /></div>
+          <div class="field"><label>Contact Number</label><input id="dcPhone" value="555-0199" /></div>
+        </div>
+        <button class="run" type="submit">Register Driver</button>
+      </form>
+      <div id="resp-driverCreate"></div>
+    </div>
+
+    <div class="panel" id="panel-driverUpdate">
+      <h2>Update Driver</h2>
+      <div class="endpoint-tag">PATCH /drivers/:id <span class="access-tag">Fleet Manager (full) / Safety Officer (status + safetyScore only)</span></div>
+      <form class="card" onsubmit="return runDriverUpdate(event)">
+        <div class="field-row">
+          <div class="field"><label>Driver ID</label><input id="duId" placeholder="driver uuid" /></div>
+          <div class="field"><label>Status</label>
+            <select id="duStatus"><option value="">(unchanged)</option><option>AVAILABLE</option><option>ON_TRIP</option><option>OFF_DUTY</option><option>SUSPENDED</option></select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Safety Score</label><input id="duScore" placeholder="0-100" /></div>
+          <div class="field"><label>Name (Fleet Manager only)</label><input id="duName" /></div>
+        </div>
+        <button class="run" type="submit">Update Driver</button>
+        <div class="hint">Log in as Safety Officer and try changing Name too — it should be silently ignored, only status/safetyScore applied.</div>
+      </form>
+      <div id="resp-driverUpdate"></div>
+    </div>
+
+    <div class="panel" id="panel-driverDelete">
+      <h2>Delete Driver</h2>
+      <div class="endpoint-tag">DELETE /drivers/:id <span class="access-tag">Fleet Manager</span></div>
+      <form class="card" onsubmit="return runDriverDelete(event)">
+        <div class="field"><label>Driver ID</label><input id="ddId" placeholder="driver uuid" /></div>
+        <button class="run danger" type="submit" style="margin-top:10px;">Delete Driver</button>
+      </form>
+      <div id="resp-driverDelete"></div>
+    </div>
+
+    <!-- ===================== TRIPS ===================== -->
+    <div class="panel" id="panel-tripsList">
+      <h2>List Trips</h2>
+      <div class="endpoint-tag">GET /trips <span class="access-tag">All roles</span></div>
+      <form class="card" onsubmit="return runTripsList(event)">
+        <div class="field"><label>Status filter</label>
+          <select id="tlStatus"><option value="">Any</option><option>DRAFT</option><option>DISPATCHED</option><option>COMPLETED</option><option>CANCELLED</option></select>
+        </div>
+        <button class="run" type="submit" style="margin-top:10px;">List Trips</button>
+      </form>
+      <div id="resp-tripsList"></div>
+    </div>
+
+    <div class="panel" id="panel-tripCreate">
+      <h2>Create Trip (Draft)</h2>
+      <div class="endpoint-tag">POST /trips <span class="access-tag">Fleet Manager & Driver</span></div>
+      <form class="card" onsubmit="return runTripCreate(event)">
+        <div class="field-row">
+          <div class="field"><label>Source</label><input id="tcSource" value="Warehouse A" /></div>
+          <div class="field"><label>Destination</label><input id="tcDest" value="Warehouse B" /></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Vehicle ID</label><input id="tcVehicle" placeholder="vehicle uuid" /></div>
+          <div class="field"><label>Driver ID</label><input id="tcDriver" placeholder="driver uuid" /></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Cargo Weight</label><input id="tcCargo" value="450" /></div>
+          <div class="field"><label>Planned Distance</label><input id="tcDist" value="120" /></div>
+        </div>
+        <button class="run" type="submit">Create Trip</button>
+      </form>
+      <div id="resp-tripCreate"></div>
+    </div>
+
+    <div class="panel" id="panel-tripDispatch">
+      <h2>Dispatch Trip</h2>
+      <div class="endpoint-desc">Flips vehicle/driver status to ON_TRIP and records starting conditions.</div>
+      <div class="endpoint-tag">PATCH /trips/:id/dispatch <span class="access-tag">Fleet Manager & Driver</span></div>
+      <form class="card" onsubmit="return runTripDispatch(event)">
+        <div class="field"><label>Trip ID</label><input id="tdId" placeholder="trip uuid" /></div>
+        <div class="field-row" style="margin-top:10px;">
+          <div class="field"><label>Estimated Fuel Level Start</label><input id="tdFuel" value="80" /></div>
+          <div class="field"><label>Odometer Start</label><input id="tdOdo" value="100" /></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Vehicle Condition</label>
+            <select id="tdCondition"><option>GOOD</option><option>FAIR</option><option>POOR</option></select>
+          </div>
+          <div class="field"><label>Maintenance Note</label><input id="tdNote" value="Check tire pressure" /></div>
+        </div>
+        <button class="run" type="submit">Dispatch</button>
+      </form>
+      <div id="resp-tripDispatch"></div>
+    </div>
+
+    <div class="panel" id="panel-tripReassign">
+      <h2>Reassign Trip</h2>
+      <div class="endpoint-desc">Change driver/vehicle on a Draft or Dispatched trip. If Dispatched, the old pair is released and the new pair is booked automatically.</div>
+      <div class="endpoint-tag">PATCH /trips/:id/reassign <span class="access-tag">Fleet Manager & Driver</span></div>
+      <form class="card" onsubmit="return runTripReassign(event)">
+        <div class="field"><label>Trip ID</label><input id="trId" placeholder="trip uuid" /></div>
+        <div class="field-row" style="margin-top:10px;">
+          <div class="field"><label>New Vehicle ID (optional)</label><input id="trVehicle" placeholder="leave blank to keep current" /></div>
+          <div class="field"><label>New Driver ID (optional)</label><input id="trDriver" placeholder="leave blank to keep current" /></div>
+        </div>
+        <button class="run" type="submit">Reassign</button>
+      </form>
+      <div id="resp-tripReassign"></div>
+    </div>
+
+    <div class="panel" id="panel-tripComplete">
+      <h2>Complete Trip</h2>
+      <div class="endpoint-tag">PATCH /trips/:id/complete <span class="access-tag">Fleet Manager & Driver</span></div>
+      <form class="card" onsubmit="return runTripComplete(event)">
+        <div class="field"><label>Trip ID</label><input id="tpId" placeholder="trip uuid" /></div>
+        <div class="field-row" style="margin-top:10px;">
+          <div class="field"><label>Odometer End</label><input id="tpOdo" value="220" /></div>
+          <div class="field"><label>Final Fuel Level</label><input id="tpFuel" value="35" /></div>
+          <div class="field"><label>Fuel Bill Amount</label><input id="tpBill" value="50" /></div>
+        </div>
+        <button class="run" type="submit">Complete Trip</button>
+      </form>
+      <div id="resp-tripComplete"></div>
+    </div>
+
+    <div class="panel" id="panel-tripCancel">
+      <h2>Cancel Trip</h2>
+      <div class="endpoint-tag">PATCH /trips/:id/cancel <span class="access-tag">Fleet Manager & Driver</span></div>
+      <form class="card" onsubmit="return runTripCancel(event)">
+        <div class="field"><label>Trip ID</label><input id="txId" placeholder="trip uuid" /></div>
+        <button class="run danger" type="submit" style="margin-top:10px;">Cancel Trip</button>
+      </form>
+      <div id="resp-tripCancel"></div>
+    </div>
+
+    <!-- ===================== MAINTENANCE ===================== -->
+    <div class="panel" id="panel-maintList">
+      <h2>List Maintenance Records</h2>
+      <div class="endpoint-tag">GET /maintenance <span class="access-tag">All roles</span></div>
+      <form class="card" onsubmit="return runMaintList(event)">
+        <div class="field-row">
+          <div class="field"><label>Status filter</label>
+            <select id="mlStatus"><option value="">Any</option><option>OPEN</option><option>CLOSED</option></select>
+          </div>
+          <div class="field"><label>Vehicle ID filter</label><input id="mlVehicle" placeholder="optional" /></div>
+        </div>
+        <button class="run" type="submit">List Records</button>
+      </form>
+      <div id="resp-maintList"></div>
+    </div>
+
+    <div class="panel" id="panel-maintCreate">
+      <h2>Create Maintenance Record</h2>
+      <div class="endpoint-desc">Flips vehicle status to IN_SHOP automatically.</div>
+      <div class="endpoint-tag">POST /maintenance <span class="access-tag">Fleet Manager & Safety Officer</span></div>
+      <form class="card" onsubmit="return runMaintCreate(event)">
+        <div class="field-row">
+          <div class="field"><label>Vehicle ID</label><input id="mcVehicle" placeholder="vehicle uuid" /></div>
+          <div class="field"><label>Reason</label><input id="mcReason" value="Engine Overheat" /></div>
+          <div class="field"><label>Cost</label><input id="mcCost" value="350" /></div>
+        </div>
+        <button class="run" type="submit">Create Record</button>
+      </form>
+      <div id="resp-maintCreate"></div>
+    </div>
+
+    <div class="panel" id="panel-maintClose">
+      <h2>Close Maintenance Record</h2>
+      <div class="endpoint-desc">Restores vehicle status to AVAILABLE (unless Retired).</div>
+      <div class="endpoint-tag">PATCH /maintenance/:id/close <span class="access-tag">Fleet Manager & Safety Officer</span></div>
+      <form class="card" onsubmit="return runMaintClose(event)">
+        <div class="field"><label>Maintenance Record ID</label><input id="mxId" placeholder="record uuid" /></div>
+        <button class="run" type="submit" style="margin-top:10px;">Close Record</button>
+      </form>
+      <div id="resp-maintClose"></div>
+    </div>
+
+    <!-- ===================== FUEL & EXPENSES ===================== -->
+    <div class="panel" id="panel-fuelList">
+      <h2>List Fuel Logs</h2>
+      <div class="endpoint-tag">GET /fuel-logs <span class="access-tag">All roles</span></div>
+      <form class="card" onsubmit="return runFuelList(event)">
+        <div class="field"><label>Vehicle ID filter</label><input id="flVehicle" placeholder="optional" /></div>
+        <button class="run" type="submit" style="margin-top:10px;">List Fuel Logs</button>
+      </form>
+      <div id="resp-fuelList"></div>
+    </div>
+
+    <div class="panel" id="panel-fuelCreate">
+      <h2>Log Fuel</h2>
+      <div class="endpoint-tag">POST /fuel-logs <span class="access-tag">Fleet Manager & Driver</span></div>
+      <form class="card" onsubmit="return runFuelCreate(event)">
+        <div class="field-row">
+          <div class="field"><label>Vehicle ID</label><input id="fcVehicle" placeholder="vehicle uuid" /></div>
+          <div class="field"><label>Trip ID (optional)</label><input id="fcTrip" placeholder="optional" /></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Liters</label><input id="fcLiters" value="50" /></div>
+          <div class="field"><label>Cost</label><input id="fcCost" value="75" /></div>
+        </div>
+        <button class="run" type="submit">Log Fuel</button>
+      </form>
+      <div id="resp-fuelCreate"></div>
+    </div>
+
+    <div class="panel" id="panel-expenseList">
+      <h2>List Expenses</h2>
+      <div class="endpoint-tag">GET /expenses <span class="access-tag">All roles</span></div>
+      <form class="card" onsubmit="return runExpenseList(event)">
+        <div class="field-row">
+          <div class="field"><label>Vehicle ID filter</label><input id="elVehicle" placeholder="optional" /></div>
+          <div class="field"><label>Type filter</label>
+            <select id="elType"><option value="">Any</option><option>TOLL</option><option>FINE</option><option>PARKING</option><option>OTHER</option></select>
+          </div>
+        </div>
+        <button class="run" type="submit">List Expenses</button>
+      </form>
+      <div id="resp-expenseList"></div>
+    </div>
+
+    <div class="panel" id="panel-expenseCreate">
+      <h2>Log Expense</h2>
+      <div class="endpoint-tag">POST /expenses <span class="access-tag">Fleet Manager only</span></div>
+      <form class="card" onsubmit="return runExpenseCreate(event)">
+        <div class="field-row">
+          <div class="field"><label>Vehicle ID</label><input id="ecVehicle" placeholder="vehicle uuid" /></div>
+          <div class="field"><label>Type</label>
+            <select id="ecType"><option>TOLL</option><option>FINE</option><option>PARKING</option><option>OTHER</option></select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Amount</label><input id="ecAmount" value="15.5" /></div>
+          <div class="field"><label>Description</label><input id="ecDesc" value="Highway toll" /></div>
+        </div>
+        <button class="run" type="submit">Log Expense</button>
+      </form>
+      <div id="resp-expenseCreate"></div>
+    </div>
+
+    <!-- ===================== DASHBOARD & REPORTS ===================== -->
+    <div class="panel" id="panel-kpis">
+      <h2>Dashboard KPIs</h2>
+      <div class="endpoint-tag">GET /dashboard/kpis <span class="access-tag">All roles</span></div>
+      <form class="card" onsubmit="return runKpis(event)">
+        <div class="field-row">
+          <div class="field"><label>Status filter</label>
+            <select id="kType"><option value="">Any type</option></select>
+          </div>
+          <div class="field"><label>Vehicle Type filter</label><input id="kTypeInput" placeholder="optional" /></div>
+        </div>
+        <button class="run" type="submit">Get KPIs</button>
+      </form>
+      <div id="resp-kpis"></div>
+    </div>
+
+    <div class="panel" id="panel-statusBreakdown">
+      <h2>Vehicle Status Breakdown</h2>
+      <div class="endpoint-desc">Chart-ready data for a Recharts pie/bar chart.</div>
+      <div class="endpoint-tag">GET /dashboard/vehicle-status-breakdown <span class="access-tag">All roles</span></div>
+      <form class="card" onsubmit="return runRequest(event, 'GET', '/dashboard/vehicle-status-breakdown', null, 'statusBreakdown')">
+        <button class="run" type="submit">Get Breakdown</button>
+      </form>
+      <div id="resp-statusBreakdown"></div>
+    </div>
+
+    <div class="panel" id="panel-fleetUtil">
+      <h2>Fleet Utilization</h2>
+      <div class="endpoint-tag">GET /reports/fleet-utilization <span class="access-tag">All roles</span></div>
+      <form class="card" onsubmit="return runRequest(event, 'GET', '/reports/fleet-utilization', null, 'fleetUtil')">
+        <button class="run" type="submit">Get Utilization</button>
+      </form>
+      <div id="resp-fleetUtil"></div>
+    </div>
+
+    <div class="panel" id="panel-vehicleReport">
+      <h2>Vehicle Report</h2>
+      <div class="endpoint-desc">Distance, fuel efficiency, operational cost, and ROI for a single vehicle.</div>
+      <div class="endpoint-tag">GET /reports/vehicle/:id <span class="access-tag">All roles</span></div>
+      <form class="card" onsubmit="return runVehicleReport(event)">
+        <div class="field-row">
+          <div class="field"><label>Vehicle ID</label><input id="vrId" placeholder="vehicle uuid" /></div>
+          <div class="field"><label>Revenue (optional, for ROI)</label><input id="vrRevenue" placeholder="e.g. 500" /></div>
+        </div>
+        <button class="run" type="submit">Get Report</button>
+      </form>
+      <div id="resp-vehicleReport"></div>
+    </div>
+
+    <!-- ===================== EXPORTS ===================== -->
+    <div class="panel" id="panel-exportCsv">
+      <h2>Export Vehicles — CSV</h2>
+      <div class="endpoint-tag">GET /reports/export/vehicles.csv <span class="access-tag">Fleet Manager & Financial Analyst</span></div>
+      <div class="checklist-note">Downloads a file directly — check your browser's downloads for <code>vehicles_report.csv</code>.</div>
+      <form class="card" onsubmit="return runDownload(event, '/reports/export/vehicles.csv')">
+        <button class="run" type="submit">Download CSV</button>
+      </form>
+      <div id="resp-exportCsv"></div>
+    </div>
+
+    <div class="panel" id="panel-exportPdf">
+      <h2>Export Fleet — PDF</h2>
+      <div class="endpoint-tag">GET /reports/export/vehicles.pdf <span class="access-tag">Fleet Manager & Financial Analyst</span></div>
+      <div class="checklist-note">Downloads a file directly — check your browser's downloads for <code>vehicles_report.pdf</code>.</div>
+      <form class="card" onsubmit="return runDownload(event, '/reports/export/vehicles.pdf')">
+        <button class="run" type="submit">Download PDF</button>
+      </form>
+      <div id="resp-exportPdf"></div>
+    </div>
+
+    <div class="panel" id="panel-exportVehiclePdf">
+      <h2>Export Single Vehicle Summary — PDF</h2>
+      <div class="endpoint-tag">GET /reports/export/vehicle/:id/summary.pdf <span class="access-tag">Fleet Manager & Financial Analyst</span></div>
+      <form class="card" onsubmit="return runVehiclePdfExport(event)">
+        <div class="field"><label>Vehicle ID</label><input id="evpId" placeholder="vehicle uuid" /></div>
+        <button class="run" type="submit" style="margin-top:10px;">Download Summary PDF</button>
+      </form>
+      <div id="resp-exportVehiclePdf"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ---------- State ----------
+  let token = null;
+  let currentUser = null;
+
+  // ---------- Navigation ----------
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      item.classList.add('active');
+      document.getElementById('panel-' + item.dataset.panel).classList.add('active');
+    });
+  });
+
+  function baseUrl() {
+    return document.getElementById('baseUrlInput').value.replace(/\/$/, '');
+  }
+
+  function fillLogin(email) {
+    document.getElementById('loginEmail').value = email;
+    document.getElementById('loginPassword').value = 'password123';
+  }
+
+  function updateSessionBadge() {
+    const badge = document.getElementById('sessionBadge');
+    if (currentUser) {
+      badge.textContent = `${currentUser.name} · ${currentUser.role}`;
+      badge.classList.add('logged-in');
+    } else {
+      badge.textContent = 'Not logged in';
+      badge.classList.remove('logged-in');
+    }
+  }
+
+  function logout() {
+    token = null;
+    currentUser = null;
+    updateSessionBadge();
+  }
+
+  // ---------- Generic request runner ----------
+  async function apiRequest(method, path, body) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+
+    const opts = { method, headers };
+    if (body !== null && body !== undefined) opts.body = JSON.stringify(body);
+
+    const start = performance.now();
+    let res, data, isJson = true;
+    try {
+      res = await fetch(baseUrl() + path, opts);
+      const text = await res.text();
+      try { data = JSON.parse(text); } catch { data = text; isJson = false; }
+    } catch (err) {
+      return { error: true, message: 'Network error: ' + err.message, ms: Math.round(performance.now() - start) };
+    }
+    return { status: res.status, ok: res.ok, data, isJson, ms: Math.round(performance.now() - start) };
+  }
+
+  function renderResponse(targetId, result) {
+    const el = document.getElementById('resp-' + targetId);
+    if (result.error) {
+      el.innerHTML = `<div class="status-line"><span class="status-pill status-4xx">ERROR</span></div>
+        <div class="response-box">${result.message}</div>`;
+      return;
+    }
+    const statusClass = result.status >= 200 && result.status < 300 ? 'status-2xx' : 'status-4xx';
+    const pretty = result.isJson ? JSON.stringify(result.data, null, 2) : String(result.data).slice(0, 2000);
+    el.innerHTML = `<div class="status-line">
+        <span class="status-pill ${statusClass}">${result.status}</span>
+        <span style="color:var(--text-dim)">${result.ms}ms</span>
+      </div>
+      <div class="response-box">${escapeHtml(pretty)}</div>`;
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  }
+
+  function qs(params) {
+    const parts = Object.entries(params).filter(([,v]) => v !== '' && v !== null && v !== undefined)
+      .map(([k,v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`);
+    return parts.length ? '?' + parts.join('&') : '';
+  }
+
+  // Generic form handler for simple GETs with no params
+  async function runRequest(evt, method, path, body, targetId) {
+    evt.preventDefault();
+    const btn = evt.target.querySelector('button');
+    btn.disabled = true;
+    const result = await apiRequest(method, path, body);
+    renderResponse(targetId, result);
+    btn.disabled = false;
+    return false;
+  }
+
+  // ---------- AUTH ----------
+  async function doLogin(evt) {
+    evt.preventDefault();
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    const result = await apiRequest('POST', '/auth/login', { email, password });
+    renderResponse('login', result);
+    if (result.ok && result.data && result.data.token) {
+      token = result.data.token;
+      currentUser = result.data.user;
+      updateSessionBadge();
+    }
+    return false;
+  }
+
+  // ---------- VEHICLES ----------
+  async function runVehiclesList(evt) {
+    evt.preventDefault();
+    const status = document.getElementById('vlStatus').value;
+    const type = document.getElementById('vlType').value;
+    const result = await apiRequest('GET', '/vehicles' + qs({ status, type }));
+    renderResponse('vehiclesList', result);
+    return false;
+  }
+
+  async function runVehicleCreate(evt) {
+    evt.preventDefault();
+    const body = {
+      regNumber: document.getElementById('vcReg').value,
+      name: document.getElementById('vcName').value,
+      type: document.getElementById('vcType').value,
+      maxLoadCapacity: parseFloat(document.getElementById('vcLoad').value) || 0,
+      odometer: parseFloat(document.getElementById('vcOdo').value) || 0,
+      acquisitionCost: parseFloat(document.getElementById('vcCost').value) || 0,
+    };
+    const result = await apiRequest('POST', '/vehicles', body);
+    renderResponse('vehicleCreate', result);
+    return false;
+  }
+
+  async function runVehicleUpdate(evt) {
+    evt.preventDefault();
+    const id = document.getElementById('vuId').value;
+    const body = {};
+    const status = document.getElementById('vuStatus').value;
+    const name = document.getElementById('vuName').value;
+    const odo = document.getElementById('vuOdo').value;
+    const cost = document.getElementById('vuCost').value;
+    if (status) body.status = status;
+    if (name) body.name = name;
+    if (odo) body.odometer = parseFloat(odo);
+    if (cost) body.acquisitionCost = parseFloat(cost);
+    const result = await apiRequest('PATCH', `/vehicles/${id}`, body);
+    renderResponse('vehicleUpdate', result);
+    return false;
+  }
+
+  async function runVehicleDelete(evt) {
+    evt.preventDefault();
+    const id = document.getElementById('vdId').value;
+    const result = await apiRequest('DELETE', `/vehicles/${id}`);
+    renderResponse('vehicleDelete', result);
+    return false;
+  }
+
+  async function runVehicleCost(evt) {
+    evt.preventDefault();
+    const id = document.getElementById('vocId').value;
+    const result = await apiRequest('GET', `/vehicles/${id}/operational-cost`);
+    renderResponse('vehicleCost', result);
+    return false;
+  }
+
+  // ---------- DRIVERS ----------
+  async function runDriversList(evt) {
+    evt.preventDefault();
+    const status = document.getElementById('dlStatus').value;
+    const result = await apiRequest('GET', '/drivers' + qs({ status }));
+    renderResponse('driversList', result);
+    return false;
+  }
+
+  async function runDriverCreate(evt) {
+    evt.preventDefault();
+    const body = {
+      name: document.getElementById('dcName').value,
+      licenseNumber: document.getElementById('dcLic').value,
+      licenseCategory: document.getElementById('dcCat').value,
+      licenseExpiry: document.getElementById('dcExp').value,
+      contactNumber: document.getElementById('dcPhone').value,
+    };
+    const result = await apiRequest('POST', '/drivers', body);
+    renderResponse('driverCreate', result);
+    return false;
+  }
+
+  async function runDriverUpdate(evt) {
+    evt.preventDefault();
+    const id = document.getElementById('duId').value;
+    const body = {};
+    const status = document.getElementById('duStatus').value;
+    const score = document.getElementById('duScore').value;
+    const name = document.getElementById('duName').value;
+    if (status) body.status = status;
+    if (score) body.safetyScore = parseInt(score, 10);
+    if (name) body.name = name;
+    const result = await apiRequest('PATCH', `/drivers/${id}`, body);
+    renderResponse('driverUpdate', result);
+    return false;
+  }
+
+  async function runDriverDelete(evt) {
+    evt.preventDefault();
+    const id = document.getElementById('ddId').value;
+    const result = await apiRequest('DELETE', `/drivers/${id}`);
+    renderResponse('driverDelete', result);
+    return false;
+  }
+
+  // ---------- TRIPS ----------
+  async function runTripsList(evt) {
+    evt.preventDefault();
+    const status = document.getElementById('tlStatus').value;
+    const result = await apiRequest('GET', '/trips' + qs({ status }));
+    renderResponse('tripsList', result);
+    return false;
+  }
+
+  async function runTripCreate(evt) {
+    evt.preventDefault();
+    const body = {
+      source: document.getElementById('tcSource').value,
+      destination: document.getElementById('tcDest').value,
+      vehicleId: document.getElementById('tcVehicle').value,
+      driverId: document.getElementById('tcDriver').value,
+      cargoWeight: parseFloat(document.getElementById('tcCargo').value) || 0,
+      plannedDistance: parseFloat(document.getElementById('tcDist').value) || 0,
+    };
+    const result = await apiRequest('POST', '/trips', body);
+    renderResponse('tripCreate', result);
+    return false;
+  }
+
+  async function runTripDispatch(evt) {
+    evt.preventDefault();
+    const id = document.getElementById('tdId').value;
+    const body = {
+      estimatedFuelLevelStart: parseFloat(document.getElementById('tdFuel').value) || null,
+      odometerStart: parseFloat(document.getElementById('tdOdo').value) || null,
+      vehicleCondition: document.getElementById('tdCondition').value,
+      maintenanceNote: document.getElementById('tdNote').value,
+    };
+    const result = await apiRequest('PATCH', `/trips/${id}/dispatch`, body);
+    renderResponse('tripDispatch', result);
+    return false;
+  }
+
+  async function runTripReassign(evt) {
+    evt.preventDefault();
+    const id = document.getElementById('trId').value;
+    const body = {};
+    const v = document.getElementById('trVehicle').value;
+    const d = document.getElementById('trDriver').value;
+    if (v) body.vehicleId = v;
+    if (d) body.driverId = d;
+    const result = await apiRequest('PATCH', `/trips/${id}/reassign`, body);
+    renderResponse('tripReassign', result);
+    return false;
+  }
+
+  async function runTripComplete(evt) {
+    evt.preventDefault();
+    const id = document.getElementById('tpId').value;
+    const body = {
+      odometerEnd: parseFloat(document.getElementById('tpOdo').value) || null,
+      finalFuelLevel: parseFloat(document.getElementById('tpFuel').value) || null,
+      fuelBillAmount: parseFloat(document.getElementById('tpBill').value) || null,
+    };
+    const result = await apiRequest('PATCH', `/trips/${id}/complete`, body);
+    renderResponse('tripComplete', result);
+    return false;
+  }
+
+  async function runTripCancel(evt) {
+    evt.preventDefault();
+    const id = document.getElementById('txId').value;
+    const result = await apiRequest('PATCH', `/trips/${id}/cancel`, null);
+    renderResponse('tripCancel', result);
+    return false;
+  }
+
+  // ---------- MAINTENANCE ----------
+  async function runMaintList(evt) {
+    evt.preventDefault();
+    const status = document.getElementById('mlStatus').value;
+    const vehicleId = document.getElementById('mlVehicle').value;
+    const result = await apiRequest('GET', '/maintenance' + qs({ status, vehicleId }));
+    renderResponse('maintList', result);
+    return false;
+  }
+
+  async function runMaintCreate(evt) {
+    evt.preventDefault();
+    const body = {
+      vehicleId: document.getElementById('mcVehicle').value,
+      reason: document.getElementById('mcReason').value,
+      cost: parseFloat(document.getElementById('mcCost').value) || 0,
+    };
+    const result = await apiRequest('POST', '/maintenance', body);
+    renderResponse('maintCreate', result);
+    return false;
+  }
+
+  async function runMaintClose(evt) {
+    evt.preventDefault();
+    const id = document.getElementById('mxId').value;
+    const result = await apiRequest('PATCH', `/maintenance/${id}/close`, null);
+    renderResponse('maintClose', result);
+    return false;
+  }
+
+  // ---------- FUEL & EXPENSES ----------
+  async function runFuelList(evt) {
+    evt.preventDefault();
+    const vehicleId = document.getElementById('flVehicle').value;
+    const result = await apiRequest('GET', '/fuel-logs' + qs({ vehicleId }));
+    renderResponse('fuelList', result);
+    return false;
+  }
+
+  async function runFuelCreate(evt) {
+    evt.preventDefault();
+    const body = {
+      vehicleId: document.getElementById('fcVehicle').value,
+      tripId: document.getElementById('fcTrip').value || null,
+      liters: parseFloat(document.getElementById('fcLiters').value) || 0,
+      cost: parseFloat(document.getElementById('fcCost').value) || 0,
+    };
+    const result = await apiRequest('POST', '/fuel-logs', body);
+    renderResponse('fuelCreate', result);
+    return false;
+  }
+
+  async function runExpenseList(evt) {
+    evt.preventDefault();
+    const vehicleId = document.getElementById('elVehicle').value;
+    const type = document.getElementById('elType').value;
+    const result = await apiRequest('GET', '/expenses' + qs({ vehicleId, type }));
+    renderResponse('expenseList', result);
+    return false;
+  }
+
+  async function runExpenseCreate(evt) {
+    evt.preventDefault();
+    const body = {
+      vehicleId: document.getElementById('ecVehicle').value,
+      type: document.getElementById('ecType').value,
+      amount: parseFloat(document.getElementById('ecAmount').value) || 0,
+      description: document.getElementById('ecDesc').value,
+    };
+    const result = await apiRequest('POST', '/expenses', body);
+    renderResponse('expenseCreate', result);
+    return false;
+  }
+
+  // ---------- DASHBOARD & REPORTS ----------
+  async function runKpis(evt) {
+    evt.preventDefault();
+    const type = document.getElementById('kTypeInput').value;
+    const result = await apiRequest('GET', '/dashboard/kpis' + qs({ type }));
+    renderResponse('kpis', result);
+    return false;
+  }
+
+  async function runVehicleReport(evt) {
+    evt.preventDefault();
+    const id = document.getElementById('vrId').value;
+    const revenue = document.getElementById('vrRevenue').value;
+    const result = await apiRequest('GET', `/reports/vehicle/${id}` + qs({ revenue }));
+    renderResponse('vehicleReport', result);
+    return false;
+  }
+
+  // ---------- EXPORTS (file downloads) ----------
+  async function runDownload(evt, path) {
+    evt.preventDefault();
+    const targetId = path.includes('csv') ? 'exportCsv' : 'exportPdf';
+    const el = document.getElementById('resp-' + targetId);
+    el.innerHTML = `<div class="status-line"><span class="status-pill status-pending">...</span> requesting</div>`;
+
+    try {
+      const headers = {};
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+      const res = await fetch(baseUrl() + path, { headers });
+      if (!res.ok) {
+        const text = await res.text();
+        el.innerHTML = `<div class="status-line"><span class="status-pill status-4xx">${res.status}</span></div>
+          <div class="response-box">${escapeHtml(text)}</div>`;
+        return false;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = path.split('/').pop();
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      el.innerHTML = `<div class="status-line"><span class="status-pill status-2xx">${res.status}</span></div>
+        <div class="response-box">File downloaded: ${a.download} (${blob.size} bytes, ${blob.type})</div>`;
+    } catch (err) {
+      el.innerHTML = `<div class="status-line"><span class="status-pill status-4xx">ERROR</span></div>
+        <div class="response-box">${err.message}</div>`;
+    }
+    return false;
+  }
+
+  async function runVehiclePdfExport(evt) {
+    evt.preventDefault();
+    const id = document.getElementById('evpId').value;
+    await runDownloadCustom(`/reports/export/vehicle/${id}/summary.pdf`, 'exportVehiclePdf');
+    return false;
+  }
+
+  async function runDownloadCustom(path, targetId) {
+    const el = document.getElementById('resp-' + targetId);
+    el.innerHTML = `<div class="status-line"><span class="status-pill status-pending">...</span> requesting</div>`;
+    try {
+      const headers = {};
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+      const res = await fetch(baseUrl() + path, { headers });
+      if (!res.ok) {
+        const text = await res.text();
+        el.innerHTML = `<div class="status-line"><span class="status-pill status-4xx">${res.status}</span></div>
+          <div class="response-box">${escapeHtml(text)}</div>`;
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = path.split('/').pop();
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      el.innerHTML = `<div class="status-line"><span class="status-pill status-2xx">${res.status}</span></div>
+        <div class="response-box">File downloaded: ${a.download} (${blob.size} bytes, ${blob.type})</div>`;
+    } catch (err) {
+      el.innerHTML = `<div class="status-line"><span class="status-pill status-4xx">ERROR</span></div>
+        <div class="response-box">${err.message}</div>`;
+    }
+  }
+</script>
+</body>
+</html>
