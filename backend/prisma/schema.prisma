@@ -61,3 +61,41 @@ enum DriverStatus {
   OFF_DUTY
   SUSPENDED
 }
+
+model Trip {
+  id                     String   @id @default(uuid())
+  source                 String
+  destination            String
+  vehicleId              String
+  driverId               String
+  cargoWeight            Float
+  plannedDistance        Float
+  status                 TripStatus @default(DRAFT)
+
+  // Recorded at dispatch
+  odometerStart          Float?
+  estimatedFuelLevelStart Float?
+  vehicleCondition       VehicleCondition?
+  maintenanceNote        String?
+
+  // Recorded at completion
+  odometerEnd            Float?
+  finalFuelLevel          Float?
+  fuelBillAmount          Float?
+
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+enum TripStatus {
+  DRAFT
+  DISPATCHED
+  COMPLETED
+  CANCELLED
+}
+
+enum VehicleCondition {
+  GOOD
+  FAIR
+  POOR
+}
